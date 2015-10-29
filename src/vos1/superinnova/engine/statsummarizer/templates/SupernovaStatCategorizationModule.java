@@ -54,7 +54,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
     
     
     public static int MAXIMUM_CATEGORY=96;
-    
+    boolean redundancy = false;
     public SupernovaStatCategorizationModule(StatSummarizationCore statSummarizationCore,StatSummarizerConfiguration statSummarizerConfiguration){
         this.statSummarizationCore=statSummarizationCore;
         this.statSummarizerConfiguration=statSummarizerConfiguration;
@@ -80,6 +80,9 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
             this.aggregrateType=StatSummarizationSmartResultSet.OPERATION_ADD;
         }
         
+        if ( statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy") != null ) {
+            this.redundancy = Boolean.valueOf(statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy").toString());
+        }
         
         // Count Category Size
         for(int i=0;i<SupernovaStatCategorizationModule.MAXIMUM_CATEGORY;i++){
@@ -324,14 +327,17 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
                                 foundMatchesRegex=true;
                                 break;
                             }
-                            if(foundMatchesRegex==true){
+                            if (!this.redundancy) {
+                                foundMatchesRegex = true;
                                 break;
                             }                            
                         }
                         // Check if foundMatchesRegex
-                        if(foundMatchesRegex==true){
-                            break;
-                        }                            
+                        if (!this.redundancy) {
+                            if(foundMatchesRegex==true){
+                                break;
+                            }
+                        }                  
                     }
                 }
                 /*

@@ -50,6 +50,8 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
     public static final int OUTPUT_COL_PERCENTERROR=4;    
     public static final int OUTPUT_COL_NODECOUNT=5; 
     //{"Attempt","Success","Error","%Success","%Error","NodeCount"
+    
+    boolean redundancy = false;
     public SupernovaSuccessRateSummarizationModule(StatSummarizationCore statSummarizationCore,StatSummarizerConfiguration statSummarizerConfiguration){
         this.statSummarizationCore=statSummarizationCore;
         this.statSummarizerConfiguration=statSummarizerConfiguration;
@@ -74,6 +76,10 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
            for(int i=0;i<columnName.length;i++){
                columnName[i] = this.paramPrefix+"."+columnName[i];
            }
+        }
+        
+        if ( statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy") != null ) {
+            redundancy = Boolean.valueOf(statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy").toString());
         }
     }
 
@@ -171,12 +177,16 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                             else{
                                 //System.out.println("[DEBUG] Skip Null Object : "+site+","+block+","+subBlock+","+columnNumber+","+operation+","+obj);
                             }
-                            foundMatchesRegex=true;
-                            break;
+                            if (!this.redundancy) {
+                                foundMatchesRegex = true;
+                                break;
+                            }
                         }
                     }
-                    if(foundMatchesRegex==true){
-                        break;
+                    if (!this.redundancy) {
+                        if(foundMatchesRegex==true){
+                            break;
+                        }
                     }
                 }
             }// End For #1
