@@ -5,12 +5,16 @@
 package vos1.superinnova.engine.statsummarizer;
 
 import java.util.Date;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author HugeScreen
  */
 public class StatSummarizationResultSet {
+    
+    final static Logger logger = Logger.getLogger(StatSummarizationResultSet.class);
+
     public static final int TYPE_STRING=0;
     public static final int TYPE_DATE=2;
     public static final int TYPE_INT=3;
@@ -32,13 +36,19 @@ public class StatSummarizationResultSet {
     
     
     public StatSummarizationResultSet(int row,int[] metaData,String[] columnName,String[] unitType){
-        if(metaData.length>0 && (metaData.length==columnName.length) && (columnName.length==unitType.length) ){
+        try {
+            if(metaData.length>0 && (metaData.length==columnName.length) && (columnName.length==unitType.length) ){
             this.columnSize=metaData.length;
             this.metaData=metaData;
             this.columnName=columnName;
             this.unitType=unitType;
             this.lastestDataSet = new Object[row][this.columnSize];
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+            logger.error("Error StatSummarizationResultSet set data");
         }
+        
     }
     
     public void putObject(int i,int j,Object rowObj){

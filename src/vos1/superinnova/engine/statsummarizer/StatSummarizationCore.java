@@ -5,6 +5,7 @@
 package vos1.superinnova.engine.statsummarizer;
 
 import java.util.Properties;
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatProcessor;
 import vos1.superinnova.engine.statsummarizer.templates.SupernovaMultiSuccessRateSummarizationModule;
 import vos1.superinnova.engine.statsummarizer.templates.SupernovaRegexFilterizationModule;
@@ -18,6 +19,8 @@ import vos1.superinnova.engine.statsummarizer.templates.SupernovaSuccessRateSumm
  * @author HugeScreen
  */
 public class StatSummarizationCore {
+    final static Logger logger = Logger.getLogger(StatSummarizationCore.class);
+
     SuperInnovaStatProcessor superInnovaStatProcessor;
     StatSummarizationModule[] statSummarizationModuleArray = null;
     StatSummarizerConfiguration[] statSummarizerConfigurationArray=null;
@@ -45,6 +48,7 @@ public class StatSummarizationCore {
                     statSummarizerNameMap.put(this.statSummarizerConfigurationArray[i].getStatName(), new Integer(i));
                 }
                 catch(Exception e){
+                    logger.error("Error makeStatSummarizationModule");
                     e.printStackTrace();
                 }
                 //darkMetamorphosis
@@ -76,6 +80,7 @@ public class StatSummarizationCore {
         }                  
         
         else{
+            logger.error("Error : cannot create StatSummarizationModule From Configuration "+statSummarizerConfiguration.statName+", "+statSummarizerConfiguration.summarizationModule);
             Exception e = new Exception("Error : cannot create StatSummarizationModule From Configuration "+statSummarizerConfiguration.statName+", "+statSummarizerConfiguration.summarizationModule);
             e.fillInStackTrace();
             throw e;

@@ -259,21 +259,21 @@ public final class SuperInnovaStatCore extends Thread{
         */
 
         Properties pro = new Properties();
-        pro.setProperty("log4j.rootLogger", "ERROR, stdout, file");
+        pro.setProperty("log4j.rootLogger", "ERROR, file");
         if ( logLevel != null ){
             if (logLevel.toUpperCase().equals("FATAL")||logLevel.toUpperCase().equals("ERROR")
                 ||logLevel.toUpperCase().equals("WARN")||logLevel.toUpperCase().equals("INFO")
                 ||logLevel.toUpperCase().equals("DEBUG")||logLevel.toUpperCase().equals("TRACE")
                 ||logLevel.toUpperCase().equals("OFF")) {
-                pro.setProperty("log4j.rootLogger", logLevel.toLowerCase()+ ", stdout, file");
+                pro.setProperty("log4j.rootLogger", logLevel.toLowerCase()+ ",file");
             }
         }
         
         // Redirect log messages to console
-        pro.setProperty("log4j.appender.stdout","org.apache.log4j.ConsoleAppender");
-        pro.setProperty("log4j.appender.stdout.Target","System.out");
-        pro.setProperty("log4j.appender.stdout.layout","org.apache.log4j.PatternLayout");
-        pro.setProperty("log4j.appender.stdout.layout.ConversionPattern","%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
+//        pro.setProperty("log4j.appender.stdout","org.apache.log4j.ConsoleAppender");
+//        pro.setProperty("log4j.appender.stdout.Target","System.out");
+//        pro.setProperty("log4j.appender.stdout.layout","org.apache.log4j.PatternLayout");
+//        pro.setProperty("log4j.appender.stdout.layout.ConversionPattern","%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
         
         // Redirect log messages to a log file, support file rolling.
         pro.setProperty("log4j.appender.file","org.apache.log4j.DailyRollingFileAppender");
