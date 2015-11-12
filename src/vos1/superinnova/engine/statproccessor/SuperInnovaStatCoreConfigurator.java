@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.util.Enumeration;
 import java.util.Properties;
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
 import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
 
@@ -18,6 +19,8 @@ import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
  * @author HugeScreen
  */
 public class SuperInnovaStatCoreConfigurator {
+    
+    final static Logger logger = Logger.getLogger(SuperInnovaStatCoreConfigurator.class);
     
     File rootConfigurationPath=null;
     
@@ -47,6 +50,7 @@ public class SuperInnovaStatCoreConfigurator {
     SuperInnovaStatEngineConfiguration[] superInnovaStatEngineConfiguration2DArray=null;
     
     public SuperInnovaStatCoreConfigurator(String rootConfigurationPath){
+        
         engineCoreConfiguration = new Properties();
         engineList = new Properties();
         engineNameList=new String[SuperInnovaStatCoreConfigurator.MAXIMUM_ENGINE];
@@ -94,12 +98,15 @@ public class SuperInnovaStatCoreConfigurator {
                         }
                         catch(Exception e){
                             e.printStackTrace();
+                            logger.error("Configuration error :" + engineConfiguration[engineConfigurationCounter].getCanonicalPath()+SuperInnovaStatCoreConfigurator.fileSeparator+SuperInnovaStatCoreConfigurator.ENGINE_CONFIGURATION_FILENAME);
                         }
                         finally{
                             try{
                                 bufferedReader.close();
                             }
-                            catch(Exception e){};
+                            catch(Exception e){
+                                logger.error("Configuration error :" + engineConfiguration[engineConfigurationCounter].getCanonicalPath()+SuperInnovaStatCoreConfigurator.fileSeparator+SuperInnovaStatCoreConfigurator.ENGINE_CONFIGURATION_FILENAME);
+                            };
                         }
                         // Init statGathererConfigurationCounter UsableRow
                         if(usableRow>0){
@@ -136,12 +143,17 @@ public class SuperInnovaStatCoreConfigurator {
                         }
                         catch(Exception e){
                             e.printStackTrace();
+                            logger.error("Configuration error :" + engineConfiguration[engineConfigurationCounter].getCanonicalPath()+SuperInnovaStatCoreConfigurator.fileSeparator+SuperInnovaStatCoreConfigurator.GATHERERCONFIGURATION_DIRECTORY+SuperInnovaStatCoreConfigurator.fileSeparator+GATHERERTARGET_FILENAME);
+
                         }
                         finally{
                             try{
                                 bufferedReader.close();
                             }
-                            catch(Exception e){};
+                            catch(Exception e)
+                            {
+                                logger.error("Configuration error :" + engineConfiguration[engineConfigurationCounter].getCanonicalPath()+SuperInnovaStatCoreConfigurator.fileSeparator+SuperInnovaStatCoreConfigurator.GATHERERCONFIGURATION_DIRECTORY+SuperInnovaStatCoreConfigurator.fileSeparator+GATHERERTARGET_FILENAME);
+                            };
                         }
                         
                         
@@ -178,6 +190,7 @@ public class SuperInnovaStatCoreConfigurator {
         }//End Try
         catch(Exception e){
             e.printStackTrace();
+            logger.fatal("Error Configruration");
         }
         
         

@@ -273,9 +273,9 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
         catch(Exception e){
             e.printStackTrace();
         }
-
-        
-            StatSummarizationSmartResultSet tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);
+            
+                    
+            StatSummarizationSmartResultSet tmpStatSummarizationSmartResultSet  = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);        
             //tmpStatSummarizationSmartResultSet.dumpDataSet();
             //System.out.println("==============================================================================================");
             //this.statSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);

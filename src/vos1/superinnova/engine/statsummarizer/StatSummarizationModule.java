@@ -5,6 +5,7 @@
 package vos1.superinnova.engine.statsummarizer;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  *
@@ -29,7 +30,7 @@ public abstract class StatSummarizationModule implements Runnable{
     public abstract void summarizeData(ResultSet resultSet);
     public abstract Object[] getSummarizationResultSet(String key);
     
-    public void startStatSummarizationProcess(){
+    public void startStatSummarizationProcess() {
         System.out.println("startStatSummarizationProcess : "+this.statSummarizerConfiguration.toString());
         ResultSet rs = fetchDataFromStorage();
         summarizeData(rs);

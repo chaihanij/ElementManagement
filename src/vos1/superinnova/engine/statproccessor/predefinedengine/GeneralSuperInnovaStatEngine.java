@@ -6,6 +6,7 @@ package vos1.superinnova.engine.statproccessor.predefinedengine;
 
 import java.util.Enumeration;
 import java.util.Properties;
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEngine;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEngineConfiguration;
@@ -22,6 +23,7 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
     //StatGatherConfiguration[] statGatherConfiguartionArray=null;
     
     
+    final static Logger logger = Logger.getLogger(GeneralSuperInnovaStatEngine.class);
 
     
     public static final String SITE_KEYWORD="SITE";
@@ -46,12 +48,15 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
         
         
         Properties p = this.superInnovaStatEnginePropertiesLookup.getCategory(SITE_KEYWORD);
+        logger.debug("DEBUG Size : "+p.size());
         System.out.println("DEBUG Size : "+p.size());
         
         Enumeration e = p.keys();
         while(e.hasMoreElements()){
             System.out.println(e.nextElement());
+            logger.debug(e.nextElement());
         }
+        logger.debug("END DEBUG");
         System.out.println("END DEBUG");
         // Need to run after makeLookup Process
         this.superInnovaStatProcessor= new GeneralSuperNovaStatProcessor(this); 

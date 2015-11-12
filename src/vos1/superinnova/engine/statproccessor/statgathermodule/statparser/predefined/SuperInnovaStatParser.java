@@ -6,6 +6,8 @@ package vos1.superinnova.engine.statproccessor.statgathermodule.statparser.prede
 
 import java.io.BufferedReader;
 import java.io.StringReader;
+import org.apache.log4j.Logger;
+import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEnginePropertiesLookup;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
@@ -18,6 +20,8 @@ import vos1.superinnova.engine.statproccessor.statgathermodule.StatGathererParse
  */
 public class SuperInnovaStatParser extends StatGathererParser{
     
+    final static Logger logger = Logger.getLogger(SuperInnovaStatParser.class);
+
     StatGathererExecutor statGathererExecutor=null;
     public SuperInnovaStatParser(StatGathererExecutor statGathererExecutor){
         this.statGathererExecutor=statGathererExecutor;
@@ -39,7 +43,8 @@ public class SuperInnovaStatParser extends StatGathererParser{
         "sumCounter BIGINT,\n" +
         "primary key (site,block,subBlock,date,hostname,statname),\n" +
         "unique (date,hostname,statname)\n" +
-        ")";        
+        ")";   
+        logger.debug(createRawSuperInnovaTable);
         System.out.println(createRawSuperInnovaTable);
         return new String[]{createRawSuperInnovaTable};
     }
@@ -150,6 +155,7 @@ public class SuperInnovaStatParser extends StatGathererParser{
             }
             catch(Exception e){
                 e.printStackTrace();
+                logger.error("Error Command insert.");
                 return null;
             }            
 

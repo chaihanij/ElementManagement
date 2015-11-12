@@ -4,6 +4,7 @@
  */
 package vos1.superinnova.engine.statproccessor.statgathermodule.http;
 
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherer;
 import vos1.superinnova.engine.statproccessor.statgathermodule.util.http.HTTPReader;
 
@@ -12,6 +13,8 @@ import vos1.superinnova.engine.statproccessor.statgathermodule.util.http.HTTPRea
  * @author HugeScreen
  */
 public class HTTPStatGatherer extends StatGatherer{
+    final static Logger logger = Logger.getLogger(HTTPStatGatherer.class);
+
     String url=null;
     public HTTPStatGatherer(String url){
         this.url=url;
@@ -24,6 +27,8 @@ public class HTTPStatGatherer extends StatGatherer{
             //System.out.println(this.gatherOutput);
         }
         catch(Exception e){
+            logger.error("StatGatherer Error");
+            logger.error("gathererStatus="+ StatGatherer.STATUS_ERROR);
             this.gathererStatus=StatGatherer.STATUS_ERROR;
         }
         this.gathererStatus=StatGatherer.STATUS_FINISHED;

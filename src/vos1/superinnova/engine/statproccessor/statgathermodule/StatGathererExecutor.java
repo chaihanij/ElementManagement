@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatProcessor;
 
 import vos1.superinnova.engine.statproccessor.statgathermodule.http.HTTPStatGatherer;
@@ -22,6 +23,7 @@ import vos1.superinnova.engine.statproccessor.statgathermodule.statparser.predef
  * @author HugeScreen
  */
 public class StatGathererExecutor extends Thread{
+    final static Logger logger = Logger.getLogger(StatGathererExecutor.class);
 
     SuperInnovaStatProcessor superInnovaStatProcessor=null;
     int failedThreadCounter=-1;
@@ -88,6 +90,7 @@ public class StatGathererExecutor extends Thread{
                 
             }
             catch(Exception e){
+                logger.error("Error : Truncate RawTable Before New Insert" );
                 e.printStackTrace();
             }
             
@@ -155,6 +158,7 @@ public class StatGathererExecutor extends Thread{
 }
 
 class StatGathererExecutorChild implements Runnable{
+    final static Logger logger = Logger.getLogger(StatGathererExecutorChild.class);
     StatGathererExecutor statGathererExecutor;
     StatGatherConfiguration statGatherConfiguartion;
     public StatGathererExecutorChild(StatGathererExecutor statGathererExecutor,StatGatherConfiguration statGatherConfiguartion){
@@ -200,6 +204,7 @@ class StatGathererExecutorChild implements Runnable{
                                 }
                             }
                             catch(Exception e){
+                                logger.error("Error SQL updateDatabase: "+insertIntoRawTableSQL[i]);
                                 System.out.println("Error SQL : "+insertIntoRawTableSQL[i]);
                                 e.printStackTrace();
                             }                                   
@@ -215,6 +220,7 @@ class StatGathererExecutorChild implements Runnable{
         }
         catch(Exception e){
             this.statGathererExecutor.tickFailedThreadCounter();
+            logger.error("Error : " + e);
             e.printStackTrace();
         }
         this.statGathererExecutor.tickFailedThreadCounter();
