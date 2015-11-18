@@ -13,5 +13,5 @@ import java.util.Properties;
 public interface SuperInnovaStatTextResponseAble {
     public String getTextResponse(String input);
     public String getTextResponse(Properties inputParam);
-    
+
 }

@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEnginePropertiesLookup;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatProcessor;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
@@ -21,153 +23,138 @@ import vos1.superinnova.engine.statsummarizer.StatSummarizationModule;
 import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
 
 /**
- *
  * @author HugeScreen
  */
-public class GeneralSuperNovaStatProcessor extends SuperInnovaStatProcessor{
-    
+public class GeneralSuperNovaStatProcessor extends SuperInnovaStatProcessor {
 
-    
-    String storageType="mem";
-    
+    final static Logger logger = Logger.getLogger(GeneralSuperNovaStatProcessor.class);
+
+
+    String storageType = "mem";
+
     // Stat Gatherer
-    StatGathererExecutor statGathererExecutor=null;
-    GeneralSuperInnovaStatEngine ocfSuperInnovaStatEngine=null;
+    StatGathererExecutor statGathererExecutor = null;
+    GeneralSuperInnovaStatEngine ocfSuperInnovaStatEngine = null;
 
-    
-    
-    public GeneralSuperNovaStatProcessor(GeneralSuperInnovaStatEngine ocfSuperInnovaStatEngine){
-        this.storageName=ocfSuperInnovaStatEngine.getSuperInnovaStatEngineConfiguration().getEngineName();
+    public GeneralSuperNovaStatProcessor(GeneralSuperInnovaStatEngine ocfSuperInnovaStatEngine) {
+        logger.info("Statictics processor engine : " + ocfSuperInnovaStatEngine.getSuperInnovaStatEngineConfiguration().getEngineName());
+        this.storageName = ocfSuperInnovaStatEngine.getSuperInnovaStatEngineConfiguration().getEngineName();
         ocfSuperInnovaStatEngine.put("ENGINE", "StorageName", storageName);
         this.statGathererExecutor = new StatGathererExecutor(this);
         this.statGathererParser = new SuperInnovaStatParser(this.statGathererExecutor);
-        this.statGatherConfiguartionArray=ocfSuperInnovaStatEngine.getStatGatherConfiguration();
+        this.statGatherConfiguartionArray = ocfSuperInnovaStatEngine.getStatGatherConfiguration();
         this.ocfSuperInnovaStatEngine = ocfSuperInnovaStatEngine;
-        this.superInnovaStatEngine=ocfSuperInnovaStatEngine;
-        
-        
-        
-        
-        
-        
+        this.superInnovaStatEngine = ocfSuperInnovaStatEngine;
         initSuperInnovaStatDatabase();
         this.statSummarizationCore = new StatSummarizationCore(this);
-    }  
-    
+    }
 
-    
+
     @Override
-    public SuperInnovaStatEnginePropertiesLookup getSuperInnovaStatEnginePropertiesLookup(){
+    public SuperInnovaStatEnginePropertiesLookup getSuperInnovaStatEnginePropertiesLookup() {
         return this.ocfSuperInnovaStatEngine.getSuperInnovaStatEnginePropertiesLookup();
     }
-    
+
     @Override
-    public Object lookupKeyValue(String category, Object key){
+    public Object lookupKeyValue(String category, Object key) {
         return this.ocfSuperInnovaStatEngine.getSuperInnovaStatEnginePropertiesLookup().get(category, key);
     }
-    
-    public void initSuperInnovaStatDatabase(){
+
+    public void initSuperInnovaStatDatabase() {
+        logger.info("initSuperInnovaStatDatabase");
+
         dbConnection = new HSQLDBManager();
+        logger.info("Connect databases. Storage type : [" + this.storageType + "] Storage name : [" + this.storageName + "]");
         dbConnection.connect(this.storageType, this.storageName);
-        
-        try{
+
+        try {
             dbConnection.update("SET AUTOCOMMIT TRUE");
             dbConnection.update("SET DATABASE SQL LONGVAR IS LOB TRUE");
+        } catch (Exception e) {
+            logger.error("SET AUTOCOMMIT TRUE");
+            logger.error("SET DATABASE SQL LONGVAR IS LOB TRUE");
+            logger.fatal(e);
         }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        
-        try{
-            String[] createRawTableSQL=this.statGathererParser.getCreateRawTableSQL(this.ocfSuperInnovaStatEngine.getSuperInnovaStatEnginePropertiesLookup());
-            if(createRawTableSQL!=null && createRawTableSQL.length>0){
-                for(int i=0;i<createRawTableSQL.length;i++){
-                    if(createRawTableSQL!=null){
+
+        try {
+            String[] createRawTableSQL = this.statGathererParser.getCreateRawTableSQL(this.ocfSuperInnovaStatEngine.getSuperInnovaStatEnginePropertiesLookup());
+            StringBuilder _strCreateTable = new StringBuilder();
+            for (String _ratTable : createRawTableSQL) {
+                _strCreateTable.append(_ratTable + " ");
+            }
+            logger.debug(_strCreateTable.toString().replace("\n", " "));
+
+
+            if (createRawTableSQL != null && createRawTableSQL.length > 0) {
+                for (int i = 0; i < createRawTableSQL.length; i++) {
+                    if (createRawTableSQL != null) {
                         dbConnection.update(createRawTableSQL[i]);
                     }
                 }
-                
+
             }
-            
+
+        } catch (Exception e) {
+            logger.error("create data error");
+            logger.fatal(e);
         }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        
-        
+
+
     }
-    public SuperInnovaStatEnginePropertiesLookup getStatEnginePropertiesLookup(){
+
+    public SuperInnovaStatEnginePropertiesLookup getStatEnginePropertiesLookup() {
         return this.getSuperInnovaStatEnginePropertiesLookup();
     }
+
     @Override
-    public void run(){
-        if(this.statGatherConfiguartionArray!=null && this.statGatherConfiguartionArray[0]!=null){
-            int fetchInterval=this.statGatherConfiguartionArray[0].getFetchInterval();
-            if(fetchInterval > 0){
+    public void run() {
+        if (this.statGatherConfiguartionArray != null && this.statGatherConfiguartionArray[0] != null) {
+            int fetchInterval = this.statGatherConfiguartionArray[0].getFetchInterval();
+            if (fetchInterval > 0) {
                 ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-                ScheduledFuture<?> schHandler = scheduler.scheduleAtFixedRate(statGathererExecutor, TimeUtil.calculateDelayInMillisecToNextLaunch(fetchInterval), fetchInterval*1000, TimeUnit.MILLISECONDS);
+                ScheduledFuture<?> schHandler = scheduler.scheduleAtFixedRate(statGathererExecutor, TimeUtil.calculateDelayInMillisecToNextLaunch(fetchInterval), fetchInterval * 1000, TimeUnit.MILLISECONDS);
+            } else {
+                logger.error("FetchInterval is Zero");
             }
-            else{
-                System.out.println("Error : FetchInterval is Zero");
-            }
-        }
-        else{
-            System.out.println("Error : StatGathererConfiguration is null");
+        } else {
+            logger.error("StatGathererConfiguration is null ");
         }
     }
-    
-    
+
+
     @Override
-    public void initDatabase(){
+    public void initDatabase() {
         initSuperInnovaStatDatabase();
     }
+
     @Override
-    public int updateDatabase(String sql){
+    public int updateDatabase(String sql) {
         //System.out.println("update SQL : "+sql);
-        try{
+        try {
             this.dbConnection.update(sql);
-        }
-        catch(Exception e){
-            System.err.println("[Exception] SQL : "+sql);
-            //e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Update sql error : " + sql);
+            logger.error(e);
             return -1;
         }
         return 0;
     }
+
     @Override
-    public ResultSet queryDatabse(String sql){
-        try{
+    public ResultSet queryDatabse(String sql) {
+        try {
             return this.dbConnection.query(sql);
-        }
-        catch(Exception e){
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.error("Query sql error : " + sql);
+            logger.error(e);
             return null;
         }
     }
 
 
     @Override
-    public void beginStatSummarizationProcess(){
-        System.out.println("**==**==** BEGINE : STAT SUMMARIZATION PROCESS ==**==**==**==");
+    public void beginStatSummarizationProcess() {
+        logger.debug("Begine : STAT SUMMARIZATION PROCESS");
         this.statSummarizationCore.invokeStatSummarizationProcess();
-    }
-    
-    
-    public static void main(String[] args){
-        /*
-        System.out.println("Hello World");
-        StatGatherConfiguration[] statGatherConfiguartionArray;
-            String[] hostList = new String[]{"OCF201","OCF202","OCF203","OCF204"};     
-            statGatherConfiguartionArray = new StatGatherConfiguration[hostList.length];
-            for(int i=0;i<hostList.length;i++){
-                statGatherConfiguartionArray[i] = new StatGatherConfiguration(StatGatherConfiguration.FETCHTYPE_HTTP,"CWDC","VIP-1",hostList[i],"http://localhost:9016/equinoxStat?nodeType=OCF&hostname="+hostList[i],"OCF","SuperNovaStatParser",3);
-            }
-            
-            
-            SuperInnovaStatProcessor sitp = new OCFStatProcessor(statGatherConfiguartionArray);
-            sitp.run();
-            
-        */
-        //SuperInnovaStatProcessor sitp = new OCFStatProcessor();
     }
 }

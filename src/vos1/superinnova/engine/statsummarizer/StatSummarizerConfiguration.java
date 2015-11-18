@@ -4,6 +4,8 @@
  */
 package vos1.superinnova.engine.statsummarizer;
 
+import org.apache.log4j.Logger;
+
 import java.io.FileReader;
 import java.util.Properties;
 
@@ -12,6 +14,10 @@ import java.util.Properties;
  * @author HugeScreen
  */
 public class StatSummarizerConfiguration {
+
+    final static Logger logger = Logger.getLogger(StatSummarizerConfiguration.class);
+
+
     boolean rootLevelSummarization=false;
     boolean siteSummarization=false;
     boolean vipSummarization=false;
@@ -54,7 +60,7 @@ public class StatSummarizerConfiguration {
             return new StatSummarizerConfiguration(statname,summarizationModule,booleanArray[0],booleanArray[1],booleanArray[2],booleanArray[3],prop);
         }
         catch(Exception e){
-            e.printStackTrace();
+            logger.error(e);
         }
         return null;
     }
@@ -124,14 +130,7 @@ public class StatSummarizerConfiguration {
             
         }// Enf if this.statSummarzation...
     }
-    /*
-     name=OCF_General_SuccessRate
-summarization_module=successRate
-summarization_level=ROOT|SITE|BLOCK|SUBBLOCK
-param_attempt=attempt
-param_success=success
-param_error=error
-     */
+
     @Override
     public String toString(){
         StringBuffer sb = new StringBuffer();
@@ -147,14 +146,5 @@ param_error=error
         sb.append(",");
         sb.append(subBlockSummarization);         
         return sb.toString();
-    }
-    
-    
-    
-    
-    
-    public static void main(String[] args){
-        System.out.println("Hello World");
-        //StatSummarizerConfiguration smc = new StatSummarizerConfiguration("D:\\tmp\\OCF_SUCCESSRATE.conf");
     }
 }

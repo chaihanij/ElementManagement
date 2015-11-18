@@ -8,7 +8,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.Timestamp;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
+import vos1.superinnova.engine.statproccessor.statgathermodule.HSQLDBManager;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationCore;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationModule;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationResultSet;
@@ -19,7 +22,10 @@ import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
  *
  * @author HugeScreen
  */
-public class SupernovaStatCategorizationModule extends StatSummarizationModule{
+public class SupernovaStatCategorizationModule extends StatSummarizationModule {
+
+    final static Logger logger = Logger.getLogger(SupernovaStatCategorizationModule.class);
+
     int[] metaData=null;
     String[] columnName=null;
     String[] unitType=null;
@@ -63,13 +69,14 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
         Properties siteProp=statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SITE_KEYWORD);
         Properties blockProp=statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.BLOCK_KEYWORD);
         Properties subBlockProp=statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SUBBLOCK_KEYWORD);
-        System.out.println("Site members : "+siteProp.size());
-        System.out.println("Block members : "+blockProp.size());
-        System.out.println("Site members : "+subBlockProp.size());
+//        System.out.println("Site members : "+siteProp.size());
+//        System.out.println("Block members : "+blockProp.size());
+//        System.out.println("Site members : "+subBlockProp.size());
         this.row=siteProp.size()-1+blockProp.size()-1+subBlockProp.size()-1;
         
         // Initailize SupernovaStatCategorizationModule
         String aggregrateTypeText=statSummarizerConfiguration.getAdditionalProperties().getProperty("aggregrateType");
+
         if(aggregrateTypeText.compareToIgnoreCase("sum")==0){
             this.aggregrateType=StatSummarizationSmartResultSet.OPERATION_ADD;
         }
@@ -87,13 +94,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
         // Count Category Size
         for(int i=0;i<SupernovaStatCategorizationModule.MAXIMUM_CATEGORY;i++){
             String runningNumber=String.format("%02d", i+1);
-                System.out.println(
-                "param_category_"+runningNumber+"_vartype"
-                        +","+ "param_category_"+runningNumber+"_name"
-                        +","+ "param_category_"+runningNumber+"_unit"
-                        +","+ "param_category_"+runningNumber+"_detectFrom"
-                        );            
-            
+
             if(statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_vartype")!=null
                && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_name")!=null
                && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_unit")!=null
@@ -110,7 +111,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
         
         // if categorySize < 1 Then Return & Print Error Log
         if(this.categorySize<1){
-            System.out.println("Error : StatCategorizationModule, categorySize is less than 1");
+            logger.error("StatCategorizationModule, categorySize is less than 1");
             return;
         }
         
@@ -141,6 +142,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
                     divideBy[i]=Integer.parseInt(statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_divideBy"));
                 }
                 catch(Exception e){
+                    logger.warn("divideBy[" + i + "]" + "error and set value = 1");
                     divideBy[i]=1;
                     //e.printStackTrace();
                 }
@@ -192,12 +194,12 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
     public void summarizeData(ResultSet resultSet) {
         if(resultSet!=null){
             try{
-                //HSQLDBManager.dump(resultSet);
+//                HSQLDBManager.dump(resultSet);
                 summarizeResultSet(resultSet);
                 //this.statSummarizationSmartResultSet.dumpDataSet();
             }
             catch(Exception e){
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     }
@@ -362,7 +364,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule{
             }
             catch(Exception e){
                 this.statSummarizationSmartResultSet=null;
-                e.printStackTrace();
+                logger.error(e);
             }
     }
     @Override

@@ -9,7 +9,10 @@ import java.sql.Timestamp;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
+import vos1.superinnova.engine.statproccessor.statgathermodule.HSQLDBManager;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationCore;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationModule;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationResultSet;
@@ -21,6 +24,9 @@ import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
  * @author HugeScreen
  */
 public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
+
+    final static Logger logger = Logger.getLogger(SupernovaRegexFilterizationModule.class);
+
     int[] metaData=null;
     String[] columnName=null;
     String[] unitType=null;
@@ -64,9 +70,8 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
         Properties siteProp=statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SITE_KEYWORD);
         Properties blockProp=statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.BLOCK_KEYWORD);
         Properties subBlockProp=statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SUBBLOCK_KEYWORD);
-        System.out.println("Site members : "+siteProp.size());
-        System.out.println("Block members : "+blockProp.size());
-        System.out.println("Site members : "+subBlockProp.size());
+
+
         this.row=siteProp.size()-1+blockProp.size()-1+subBlockProp.size()-1;
         
        
@@ -74,12 +79,14 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
         // Count Category Size
         for(int i=0;i<SupernovaRegexFilterizationModule.MAXIMUM_CATEGORY;i++){
             String runningNumber=String.format("%02d", i+1);
-                System.out.println(
-                "param_category_"+runningNumber+"_vartype"
-                        +","+ "param_category_"+runningNumber+"_unit"
-                        +","+ "param_category_"+runningNumber+"_detectFrom"
-                        );            
-            
+//                StringBuilder _category = new StringBuilder();
+//                _category.append("param_category_" + runningNumber + "_vartype");
+//                System.out.println(
+//                "param_category_"+runningNumber+"_vartype"
+//                        +","+ "param_category_"+runningNumber+"_unit"
+//                        +","+ "param_category_"+runningNumber+"_detectFrom"
+//                        );
+//
             if(statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_vartype")!=null
                && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_unit")!=null
                && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_detectFrom")!=null
@@ -94,23 +101,28 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
         
         // if categorySize < 1 Then Return & Print Error Log
         if(this.categorySize<1){
-            System.out.println("Error : StatRegexFilterizationModule, categorySize is less than 1");
+            // System.out.println("Error : StatRegexFilterizationModule, categorySize is less than 1");
+            logger.error("Error : StatRegexFilterizationModule, categorySize is less than 1");
             return;
         }
         
-        System.out.println("this.categorySize : "+this.categorySize);
+        // System.out.println("this.categorySize : "+this.categorySize);
+        logger.info("Category size : " + this.categorySize);
+
         inputSRegexParam = new String[this.categorySize][];
         divideBy = new int[this.categorySize+1];
         for(int i=0;i<this.categorySize;i++){
 
-            String runningNumber=String.format("%02d", i+1);
-            String txt_param_detectFrom=statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_"+runningNumber+"_detectFrom");
+            String runningNumber = String.format("%02d", i+1);
+            String txt_param_detectFrom = statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_detectFrom");
+            logger.debug("param_category_"+runningNumber+"_detectFrom="  + txt_param_detectFrom);
             if(txt_param_detectFrom.length()>0){
                 inputSRegexParam[i] = txt_param_detectFrom.split("\\|");
                 // If configuration was found, Then make 1 increment to category Size
             }
             else{
-                System.out.println("Error : StatRegexFilterizationModule, cannot parse "+txt_param_detectFrom);
+                logger.error("Error : StatRegexFilterizationModule, cannot parse "+txt_param_detectFrom);
+//              System.out.println("Error : StatRegexFilterizationModule, cannot parse "+txt_param_detectFrom);
                 return;
             }            
             
@@ -122,7 +134,7 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
                 }
                 catch(Exception e){
                     divideBy[i]=1;
-                    //e.printStackTrace();
+                    logger.warn("divideBy[" + i + "]" + "error and set value = 1");
                 }
             }            
         }
@@ -142,13 +154,13 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
     public void summarizeData(ResultSet resultSet) {
         if(resultSet!=null){
             try{
-                //HSQLDBManager.dump(resultSet);
+//                HSQLDBManager.dump(resultSet);
                 //getMatchFilterRegexColumn();
                 summarizeResultSet(resultSet);
                 //this.statSummarizationSmartResultSet.dumpDataSet();
             }
             catch(Exception e){
-                e.printStackTrace();
+                logger.error(e);
             }
         }
     }
@@ -192,11 +204,13 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
                 try{
                     resultSet.close();
                 }
-                catch(Exception ex){}
+                catch(Exception ex){
+                    logger.error(ex);
+                }
                 //System.out.println("================");
             }// End If getRow>0
             else{
-                System.out.println("getMatchFIlterRegexColumn, resultSet is null");
+                logger.error("getMatchFIlterRegexColumn, resultSet is null");
             }
 
         }// End Try
@@ -204,8 +218,10 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
             try{
                 resultSet.close();
             }
-            catch(Exception ex){}
-           e.printStackTrace();
+            catch(Exception ex){
+                logger.error(ex);
+            }
+            logger.error(e);
            return null;
         }
         
@@ -244,11 +260,11 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
                 metaData[filterStatNamePropKeySize]=StatSummarizationResultSet.TYPE_INT;
                 unitType[filterStatNamePropKeySize]="Server";
                 divideBy[filterStatNamePropKeySize]=1;
-               
+
                 for(int i=0;i<filterStatNamePropKeySize;i++){
                     if(filterStatNamePropKey.hasMoreElements()){
-                        String keyName = (String)filterStatNamePropKey.nextElement().toString();
-                        int categoryNumber=(int)filterStatNameProp.get(keyName);
+                        String keyName = filterStatNamePropKey.nextElement().toString();
+                        int categoryNumber= Integer.valueOf(filterStatNameProp.get(keyName).toString());
                         String runningNumber=String.format("%02d", categoryNumber+1);
                         mapColumnNumberWithStatName.put(keyName, filterStatNamePropKeyCounter);
                         //System.out.println("KEyName : "+keyName);
@@ -263,15 +279,15 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
                         filterStatNamePropKeyCounter++;
                     }// End If filterStatNamePropKey has more Elements
                     //System.out.println("Loop");
-                }// End For i Category Size   
+                }// End For i Category Size
             //
            }// End if Propkey > 0
-           System.out.println("Initiallize tmpStatSummarizationSmartResultSet");
+//           System.out.println("Initiallize tmpStatSummarizationSmartResultSet");
            
            
         }
         catch(Exception e){
-            e.printStackTrace();
+            logger.error(e);
         }
             
                     
@@ -418,7 +434,7 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule{
             }
             catch(Exception e){
                 this.statSummarizationSmartResultSet=null;
-                e.printStackTrace();
+                logger.error(e);
             }
             
     }

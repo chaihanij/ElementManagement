@@ -11,22 +11,24 @@ import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
  *
  * @author HugeScreen
  */
-public abstract class SuperInnovaStatEngine implements SuperInnovaStatTextResponseAble,Runnable{
+public abstract class SuperInnovaStatEngine implements SuperInnovaStatTextResponseAble, Runnable{
+
     protected SuperInnovaStatCore superInnovaStatCore=null;
     protected SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup= new SuperInnovaStatEnginePropertiesLookup();
     protected SuperInnovaStatEngineConfiguration superInnovaStatEngineConfiguration;
     
     protected StatGatherConfiguration[] statGatherConfiguartionArray;
     protected StatSummarizerConfiguration[]  statSummarizerConfigurationArray;
-    
     protected SuperInnovaStatProcessor superInnovaStatProcessor=null;
+
     public SuperInnovaStatEngineConfiguration getSuperInnovaStatEngineConfiguration() {
         return superInnovaStatEngineConfiguration;
     }
-    
+
     public StatGatherConfiguration[] getStatGatherConfiguration(){
         return this.statGatherConfiguartionArray;
     }
+
     public StatSummarizerConfiguration[] getStatSummarizerConfiguration(){
         return this.statSummarizerConfigurationArray;
     } 
@@ -34,13 +36,12 @@ public abstract class SuperInnovaStatEngine implements SuperInnovaStatTextRespon
     public SuperInnovaStatEnginePropertiesLookup getSuperInnovaStatEnginePropertiesLookup(){
         return this.superInnovaStatEnginePropertiesLookup;
     }
+
     public SuperInnovaStatCore getSuperInnovaStatCore(){
         return this.superInnovaStatCore;
     }
+
     public SuperInnovaStatProcessor getSuperInnovaStatProcessor() {
         return superInnovaStatProcessor;
     }
-    
-    
-    
 }

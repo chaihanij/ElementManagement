@@ -9,6 +9,7 @@ package vos1.superinnova.engine.statproccessor.statgathermodule;
  * @author HugeScreen
  */
 public class StatGatherConfiguration {
+
     private int fetchType=0;
     public static final int FETCHTYPE_UNKNWON=0;
     public static final int FETCHTYPE_HTTP=1;

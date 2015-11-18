@@ -8,6 +8,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
+
+import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGathererParser;
 import static vos1.superinnova.engine.statsummarizer.StatSummarizationResultSet.NAME_OF_VARTYPE;
@@ -20,8 +22,10 @@ import vos1.superinnova.util.PRTGUtil;
  *
  * @author HugeScreen
  */
-public class StatSummarizationSmartResultSet extends StatSummarizationResultSet{
-    
+public class StatSummarizationSmartResultSet extends StatSummarizationResultSet {
+
+    final static Logger logger = Logger.getLogger(StatSummarizationSmartResultSet.class);
+
     StatSummarizationCore statSummarizationCore;
     
     Properties[] siteLevelHostListArray=null;
@@ -95,7 +99,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet{
         int siteSize=siteProp.size()-1;
         int blockSize=blockProp.size()-1;
         int subBlockSize=subBlockProp.size()-1;
-        System.out.println("siteSize : "+siteSize+", blockSize : "+blockSize+", subBlockSize :"+subBlockSize);
+//        System.out.println("siteSize : "+siteSize+", blockSize : "+blockSize+", subBlockSize :"+subBlockSize);
         siteLevelLocationArray=new int[siteSize];
         blockLevelLocationArray=new int[blockSize];
         subBlockLevelLocationArray=new int[subBlockSize];
@@ -229,7 +233,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet{
                 this.putObject(i,j,ans);
             }
             else{
-                System.out.println("Unknown : variable Type");
+                logger.error("Unknown : variable Type");
             }
         }
         else if(operation==OPERATION_MAX){
@@ -273,7 +277,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet{
                 this.putObject(i,j,ans);
             }
             else{
-                System.out.println("Unknown : variable Type");
+                logger.error("Unknown : variable Type");
             }
         }
         else if(operation==OPERATION_SUBTRACT){
@@ -304,11 +308,11 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet{
                 this.putObject(i,j,ans);
             }
             else{
-                System.out.println("Unknown : variable Type");
+                logger.error("Unknown : variable Type");
             }
         }
         else{
-            System.out.println("Unknown : put Operation");
+            logger.error("Unknown : put Operation");
         }
     }
     
@@ -365,7 +369,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet{
                         sb.append((String)lastestDataSet[i][j]);
                         break;                    
                     default:
-                        System.out.println("Erro : Unknown Type");
+                        logger.error("Unknown Type");
                 }                
                 
             }// End J
@@ -865,7 +869,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet{
                             prtgOutput.append((String)lastestDataSet[rowMapValue][j]);
                             break;                    
                         default:
-                            System.out.println("Erro : Unknown Type");
+                            logger.error("Unknown Type");
                     }    
                     prtgOutput.append("</value>");
                     if(hideFloatTag!=true){

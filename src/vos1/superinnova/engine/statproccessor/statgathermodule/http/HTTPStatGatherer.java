@@ -27,8 +27,7 @@ public class HTTPStatGatherer extends StatGatherer{
             //System.out.println(this.gatherOutput);
         }
         catch(Exception e){
-            logger.error("StatGatherer Error");
-            logger.error("gathererStatus="+ StatGatherer.STATUS_ERROR);
+            logger.error("Get statistic error :" + this.url);
             this.gathererStatus=StatGatherer.STATUS_ERROR;
         }
         this.gathererStatus=StatGatherer.STATUS_FINISHED;

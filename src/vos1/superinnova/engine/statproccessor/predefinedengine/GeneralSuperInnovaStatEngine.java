@@ -19,13 +19,10 @@ import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
  *
  * @author HugeScreen
  */
-public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
-    //StatGatherConfiguration[] statGatherConfiguartionArray=null;
-    
-    
+public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine {
+
     final static Logger logger = Logger.getLogger(GeneralSuperInnovaStatEngine.class);
 
-    
     public static final String SITE_KEYWORD="SITE";
     public static final String BLOCK_KEYWORD="BLOCK";
     public static final String SUBBLOCK_KEYWORD="SUBBLOCK";
@@ -39,26 +36,32 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
     
             
     
-    public GeneralSuperInnovaStatEngine(SuperInnovaStatCore superInnovaStatCore,SuperInnovaStatEngineConfiguration superInnovaStatEngineConfiguration,StatGatherConfiguration[] statGatherConfiguartionArray,StatSummarizerConfiguration[]  statSummarizerConfigurationArray){
+    public GeneralSuperInnovaStatEngine(SuperInnovaStatCore superInnovaStatCore,
+                                        SuperInnovaStatEngineConfiguration superInnovaStatEngineConfiguration,
+                                        StatGatherConfiguration[] statGatherConfiguartionArray,
+                                        StatSummarizerConfiguration[]  statSummarizerConfigurationArray){
+
         this.statGatherConfiguartionArray = statGatherConfiguartionArray;
         this.superInnovaStatCore = superInnovaStatCore;
         this.statSummarizerConfigurationArray=statSummarizerConfigurationArray;
         this.superInnovaStatEngineConfiguration=superInnovaStatEngineConfiguration;
+
         makeLookup();
-        
-        
-        Properties p = this.superInnovaStatEnginePropertiesLookup.getCategory(SITE_KEYWORD);
-        logger.debug("DEBUG Size : "+p.size());
-        System.out.println("DEBUG Size : "+p.size());
-        
-        Enumeration e = p.keys();
-        while(e.hasMoreElements()){
-            System.out.println(e.nextElement());
-            logger.debug(e.nextElement());
-        }
-        logger.debug("END DEBUG");
-        System.out.println("END DEBUG");
+
+//        Properties p = this.superInnovaStatEnginePropertiesLookup.getCategory(SITE_KEYWORD);
+//        logger.debug("Size : " + p.size());
+//
+//        Enumeration e = p.keys();
+//        while(e.hasMoreElements()){
+//            String log = (String) e.nextElement();
+//            //System.out.println(log);
+//            logger.debug(log);
+//        }
+//        logger.debug("END DEBUG");
+//        System.out.println("END DEBUG");
+
         // Need to run after makeLookup Process
+        logger.info("Run StatProcessor");
         this.superInnovaStatProcessor= new GeneralSuperNovaStatProcessor(this); 
         
     }
@@ -68,39 +71,49 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
     @Override
     public String getTextResponse(String input){
         return "Hello I'm OCF";
-    }    
+    }
+
     @Override
     public void run(){
         this.superInnovaStatProcessor.run();
-    }    
-    public void put(String catgegory, Object key, Object value){
-        this.superInnovaStatEnginePropertiesLookup.put(catgegory, key, value);
     }
-    public Object get(String catgegory, Object key){
-        return this.get(catgegory, key);
-    }    
+
+    public void put(String category, Object key, Object value){
+        this.superInnovaStatEnginePropertiesLookup.put(category, key, value);
+    }
+
+    public Object get(String category, Object key){
+        return this.get(category, key);
+    }
+
     public void makeLookup(){
-        
+        logger.info("makeLookup");
         // InitateEngine Name
+
         this.superInnovaStatEnginePropertiesLookup.put(ENGINE_KEYWORD, "EngineName", superInnovaStatEngineConfiguration.getEngineName());
-        
-        
+
         int siteCounter=0;
         int blockCounter=0;      
-        int subBlockCounter=0;        
+        int subBlockCounter=0;
+
         for(int i=0;i<this.statGatherConfiguartionArray.length;i++){
-            System.out.println("CONFIG [ "+this.statGatherConfiguartionArray[i].getSite()+" , "+this.statGatherConfiguartionArray[i].getBlock()+" , "+this.statGatherConfiguartionArray[i].getSubBlock()+ " ]");
+
             // Site Check
-             
-             System.out.println("siteKey="+this.statGatherConfiguartionArray[i].getSite());            
-             if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.SITE_KEYWORD,this.statGatherConfiguartionArray[i].getSite())==null){
+            // System.out.println("siteKey="+this.statGatherConfiguartionArray[i].getSite());
+            StringBuilder _log = new StringBuilder();
+            _log.append("Site :").append(this.statGatherConfiguartionArray[i].getSite());
+            _log.append(", Block :").append(this.statGatherConfiguartionArray[i].getBlock());
+            _log.append(", SubBlock :").append(this.statGatherConfiguartionArray[i].getSubBlock());
+            logger.debug(_log);
+
+            if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.SITE_KEYWORD, this.statGatherConfiguartionArray[i].getSite()) == null){
                 this.superInnovaStatEnginePropertiesLookup.put(SITE_KEYWORD, this.statGatherConfiguartionArray[i].getSite(), siteCounter);
                 this.superInnovaStatEnginePropertiesLookup.put(SITE_REVERSE_KEYWORD, siteCounter,this.statGatherConfiguartionArray[i].getSite());
                 siteCounter++;
             }
             // block Check
              String blockUniqueKey=this.statGatherConfiguartionArray[i].getBlock();
-             System.out.println("blockUniqueKey="+blockUniqueKey);
+//             System.out.println("blockUniqueKey="+blockUniqueKey);
              if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.BLOCK_KEYWORD,blockUniqueKey)==null){
                 this.superInnovaStatEnginePropertiesLookup.put(BLOCK_KEYWORD, blockUniqueKey, blockCounter);
                 this.superInnovaStatEnginePropertiesLookup.put(BLOCK_REVERSE_KEYWORD, blockCounter, blockUniqueKey);
@@ -112,7 +125,7 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
             }
             // subBlock Check
              String subBlockUniqueKey=this.statGatherConfiguartionArray[i].getSubBlock();
-             System.out.println("subBlockUniqueKey="+subBlockUniqueKey);
+//             System.out.println("subBlockUniqueKey="+subBlockUniqueKey);
              if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.SUBBLOCK_KEYWORD,subBlockUniqueKey)==null){
                 this.superInnovaStatEnginePropertiesLookup.put(SUBBLOCK_KEYWORD, subBlockUniqueKey, subBlockCounter);
                 this.superInnovaStatEnginePropertiesLookup.put(SUBBLOCK_REVERSE_KEYWORD, subBlockCounter, subBlockUniqueKey);
@@ -122,30 +135,36 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
                 this.superInnovaStatEnginePropertiesLookup.put(SUBBLOCK_PARENT_KEYWORD, subBlockParent, subBlockCounter);
                 subBlockCounter++;                
             }
-            System.out.println("=====================");
+//            System.out.println("=====================");
         }
         
         
         // ADD UNKNOWN KEYWORD
          // Add Unknown to Site
-         if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.SITE_KEYWORD,UNKNOWN_KEYWORD)==null){
+        if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.SITE_KEYWORD,UNKNOWN_KEYWORD)==null){
             this.superInnovaStatEnginePropertiesLookup.put(SITE_KEYWORD, UNKNOWN_KEYWORD, siteCounter);
             this.superInnovaStatEnginePropertiesLookup.put(SITE_REVERSE_KEYWORD, siteCounter,UNKNOWN_KEYWORD);
             siteCounter++;
         }
-         // Add Unknown to Block
-         if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.BLOCK_KEYWORD,UNKNOWN_KEYWORD)==null){
+        // Add Unknown to Block
+        if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.BLOCK_KEYWORD,UNKNOWN_KEYWORD)==null){
             this.superInnovaStatEnginePropertiesLookup.put(BLOCK_KEYWORD, UNKNOWN_KEYWORD, blockCounter);
             this.superInnovaStatEnginePropertiesLookup.put(BLOCK_REVERSE_KEYWORD, blockCounter,UNKNOWN_KEYWORD);
             blockCounter++;
         }
-         // Add Unknown to SubBlock
-         if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.SUBBLOCK_KEYWORD,UNKNOWN_KEYWORD)==null){
-            this.superInnovaStatEnginePropertiesLookup.put(SUBBLOCK_KEYWORD, UNKNOWN_KEYWORD, subBlockCounter);
-            this.superInnovaStatEnginePropertiesLookup.put(SUBBLOCK_REVERSE_KEYWORD, subBlockCounter,UNKNOWN_KEYWORD);
-            subBlockCounter++;
-        }                   
-        
+        // Add Unknown to SubBlock
+        if(this.superInnovaStatEnginePropertiesLookup.get(GeneralSuperInnovaStatEngine.SUBBLOCK_KEYWORD,UNKNOWN_KEYWORD)==null){
+             this.superInnovaStatEnginePropertiesLookup.put(SUBBLOCK_KEYWORD, UNKNOWN_KEYWORD, subBlockCounter);
+             this.superInnovaStatEnginePropertiesLookup.put(SUBBLOCK_REVERSE_KEYWORD, subBlockCounter,UNKNOWN_KEYWORD);
+             subBlockCounter++;
+        }
+
+        StringBuilder _gatherTarget = new StringBuilder();
+        _gatherTarget.append("Target ").append("SITE size[" + siteCounter + "], ");
+        _gatherTarget.append("BLOCK size[" + blockCounter + "], ");
+        _gatherTarget.append("SUBBLOCK size[" + subBlockCounter + "]");
+        logger.info(_gatherTarget);
+
     }
     public static void main(String[] args){
         System.out.println("Hello World");
@@ -163,7 +182,7 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine{
             
         
         //SuperInnovaStatProcessor sitp = new OCFStatProcessor();
-    }    
+    }
 
     @Override
     public String getTextResponse(Properties inputParam) {

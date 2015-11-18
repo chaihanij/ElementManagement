@@ -13,6 +13,9 @@ import org.apache.log4j.Logger;
  * @author HugeScreen
  */
 public abstract class StatSummarizationModule implements Runnable{
+    
+    final static Logger logger = Logger.getLogger(StatSummarizationModule.class);
+
     protected StatSummarizationCore statSummarizationCore=null;
     protected StatSummarizationSmartResultSet statSummarizationSmartResultSet=null;
     protected StatSummarizerConfiguration statSummarizerConfiguration=null;
@@ -32,7 +35,8 @@ public abstract class StatSummarizationModule implements Runnable{
     public abstract Object[] getSummarizationResultSet(String key);
     
     public void startStatSummarizationProcess() {
-        System.out.println("startStatSummarizationProcess : "+this.statSummarizerConfiguration.toString());
+        logger.debug("startStatSummarizationProcess : "+this.statSummarizerConfiguration.toString());
+//        System.out.println("startStatSummarizationProcess : "+this.statSummarizerConfiguration.toString());
         ResultSet rs = fetchDataFromStorage();
         summarizeData(rs);
     }
