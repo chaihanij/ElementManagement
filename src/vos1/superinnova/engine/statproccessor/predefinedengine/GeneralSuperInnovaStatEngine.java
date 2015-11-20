@@ -4,16 +4,15 @@
  */
 package vos1.superinnova.engine.statproccessor.predefinedengine;
 
-import java.util.Enumeration;
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEngine;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEngineConfiguration;
-import vos1.superinnova.engine.statproccessor.SuperInnovaStatProcessor;
 import vos1.superinnova.engine.statproccessor.predefinedtype.GeneralSuperNovaStatProcessor;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
 import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
+
+import java.util.Properties;
 
 /**
  *
@@ -165,23 +164,6 @@ public class GeneralSuperInnovaStatEngine extends SuperInnovaStatEngine {
         _gatherTarget.append("SUBBLOCK size[" + subBlockCounter + "]");
         logger.info(_gatherTarget);
 
-    }
-    public static void main(String[] args){
-        System.out.println("Hello World");
-        StatGatherConfiguration[] statGatherConfiguartionArray;
-            String[] hostList = new String[]{"OCF201","OCF202","OCF203","OCF204"};     
-            statGatherConfiguartionArray = new StatGatherConfiguration[hostList.length];
-            for(int i=0;i<hostList.length;i++){
-                statGatherConfiguartionArray[i] = new StatGatherConfiguration(StatGatherConfiguration.FETCHTYPE_HTTP,"CWDC","VIP-1",hostList[i],"http://localhost:9016/equinoxStat?nodeType=OCF&hostname="+hostList[i],"OCF","SuperNovaStatParser",0,5,3);
-            }
-            
-            
-            //SuperInnovaStatEngine superInnovaStatEngine = new OCFSuperInnovaStatEngine(statGatherConfiguartionArray);
-            //superInnovaStatEngine.run();
-            
-            
-        
-        //SuperInnovaStatProcessor sitp = new OCFStatProcessor();
     }
 
     @Override

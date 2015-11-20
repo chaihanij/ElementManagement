@@ -4,18 +4,13 @@
  */
 package vos1.superinnova.engine.statsummarizer.templates;
 
+import org.apache.log4j.Logger;
+import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
+import vos1.superinnova.engine.statsummarizer.*;
+
 import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
-
-import org.apache.log4j.Logger;
-import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
-import vos1.superinnova.engine.statproccessor.statgathermodule.HSQLDBManager;
-import vos1.superinnova.engine.statsummarizer.StatSummarizationCore;
-import vos1.superinnova.engine.statsummarizer.StatSummarizationModule;
-import vos1.superinnova.engine.statsummarizer.StatSummarizationResultSet;
-import vos1.superinnova.engine.statsummarizer.StatSummarizationSmartResultSet;
-import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
 
 /**
  * @author HugeScreen
@@ -127,10 +122,18 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
     }
 
     public void summarizeResultSet(ResultSet resultSet) {
+
         StatSummarizationSmartResultSet tmpStatSummarizationSmartResultSet = null;
-        tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore, this.row, this.metaData, this.columnName, this.unitType);
+
+        tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,
+                this.row,
+                this.metaData,
+                this.columnName,
+                this.unitType);
         //tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);
+
         try {
+
             for (; resultSet.next(); ) {
                 // Check Date
                 Timestamp dateTimeStamp = resultSet.getTimestamp(1 + SupernovaSuccessRateSummarizationModule.COL_DATE);
@@ -146,7 +149,8 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
 
                 // Check Regex
                 String statName = (String) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_STATNAME);
-//                logger.debug("StatName : " + statName);
+//              logger.debug("StatName : " + statName);
+
                 boolean foundMatchesRegex = false;
                 for (int i = 0; i < this.regexParam.length; i++) {
 
@@ -173,7 +177,7 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                             if (obj != null) {
                                 tmpStatSummarizationSmartResultSet.putObject(site, block, subBlock, columnNumber, operation, obj);
                             } else {
-                                logger.error("Skip Null Object : " + site + "," + block + "," + subBlock + "," + columnNumber + "," + operation + "," + obj);
+                                logger.warn("Skip Null Object : " + site + "," + block + "," + subBlock + "," + columnNumber + "," + operation + "," + obj);
                             }
                             if (!this.redundancy) {
                                 foundMatchesRegex = true;
@@ -197,8 +201,9 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
     public static final int OUTPUT_COL_PERCENTERROR=4;    
     public static final int OUTPUT_COL_NODECOUNT=5; 
              */
-            //System.out.println("[DEBUG] rowCounter size : "+tmpStatSummarizationSmartResultSet.getRowCounter());
+            logger.debug("[DEBUG] rowCounter size : " + tmpStatSummarizationSmartResultSet.getRowCounter());
             //tmpStatSummarizationSmartResultSet.dumpDataSet();
+
             for (int i = 0; i < tmpStatSummarizationSmartResultSet.getRowCounter(); i++) {
 
                 Long attempt = (Long) tmpStatSummarizationSmartResultSet.getObject(i, OUTPUT_COL_ATTEMPT);
@@ -207,12 +212,10 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                 Float successRate = -1f;
                 Float errorRate = -1f;
 
-
-                //System.out.println("----");
-                //System.out.println("[DEBUG] i : +"+i+", Attempt : "+OUTPUT_COL_ATTEMPT);
-                //System.out.println("[DEBUG] i : +"+i+", Success : "+OUTPUT_COL_SUCCESS);
-                //System.out.println("[DEBUG] i : +"+i+", Error : "+OUTPUT_COL_ERROR);
-                //System.out.println("[DEBUG] : Attempt : "+attempt+", success : "+success+", error : "+error);
+                logger.debug("[DEBUG] i : +" + i + ", Attempt : " + OUTPUT_COL_ATTEMPT);
+                logger.debug("[DEBUG] i : +" + i + ", Success : " + OUTPUT_COL_SUCCESS);
+                logger.debug("[DEBUG] i : +" + i + ", Error : " + OUTPUT_COL_ERROR);
+                logger.debug("[DEBUG] : Attempt : " + attempt + ", success : " + success + ", error : " + error);
                 //tmpStatSummarizationSmartResultSet.dumpToString();
                 if (attempt != null && attempt >= 0) {
                     successRate = (float) success / (float) attempt * 100f;
@@ -223,7 +226,7 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                     }
                     errorRate = 100f - successRate;
                 }
-                //System.out.println("[DEBUG] : successRate : "+successRate+", errorRate : "+errorRate);
+                logger.debug("[DEBUG] : successRate : " + successRate + ", errorRate : " + errorRate);
 
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_PERCENTSUCCESS, successRate);
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_PERCENTERROR, errorRate);

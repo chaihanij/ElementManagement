@@ -4,17 +4,15 @@
  */
 package vos1.superinnova.engine.statproccessor;
 
-import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 import vos1.superinnova.engine.statinquiry.SuperInnovaStatInquiryCore;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
 import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
 
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 /**
  * @author HugeScreen
  */
@@ -47,10 +45,12 @@ public final class SuperInnovaStatCore extends Thread {
 
     public SuperInnovaStatEngine getSuperInnovaStatEngine(String engineName) {
         Integer engineIndex = (Integer) engineNameMap.get(engineName);
-        //System.out.println("engine "+engineName+" found at "+engineIndex);
+
         if (engineIndex != null) {
+            logger.debug("Engine "+engineName+" found at " + engineIndex);
             return this.superInnovaStatEngineArray[engineIndex];
         } else {
+            logger.error("Engine "+engineName+"not found.");
             return null;
         }
     }
@@ -187,13 +187,16 @@ public final class SuperInnovaStatCore extends Thread {
         }
     }
 
+    public static String logName = null;
+    public static String logLevel = null;
+
     public static void main(String[] args) {
         if (args != null && args.length > 0) {
             String rootPath = args[0];
 
-            String logName = null;
+             logName = null;
 
-            String logLevel = null;
+             logLevel = null;
 
 
             logName = args[1];
@@ -201,60 +204,17 @@ public final class SuperInnovaStatCore extends Thread {
                 logLevel = args[2];
             }
 
-            initialLogConfiguration(logName, logLevel);
+            LogConfiguration.initialLogConfiguration(logName, logLevel);
 
             if (rootPath != null && rootPath.length() > 0) {
 
                 SuperInnovaStatCore superInnovaStatCore = new SuperInnovaStatCore(rootPath);
                 superInnovaStatCore.start();
             } else {
-                logger.error("rootPath Length Error");
-                System.out.println("Error : rootPath Length Error");
+                logger.error("Please check configuration path.");
             }
         } else {
-            logger.error("Error : Please input RootPath");
-            System.out.println("Error : Please input RootPath");
+            logger.error("Please input configuration path.");
         }
-    }
-
-    public static void initialLogConfiguration(String logName, String logLevel) {
-
-        /**
-         Levels used for identifying the severity of an event. Levels are organized from most specific to least:
-         OFF (most specific)
-         FATAL
-         ERROR
-         WARN
-         INFO
-         DEBUG
-         TRACE
-         ALL (least specific)
-         */
-
-        Properties pro = new Properties();
-        pro.setProperty("log4j.rootLogger", "ALL, stdout, file");
-        if (logLevel != null) {
-            if (logLevel.toUpperCase().equals("FATAL") || logLevel.toUpperCase().equals("ERROR")
-                    || logLevel.toUpperCase().equals("WARN") || logLevel.toUpperCase().equals("INFO")
-                    || logLevel.toUpperCase().equals("DEBUG") || logLevel.toUpperCase().equals("TRACE")
-                    || logLevel.toUpperCase().equals("OFF")) {
-                pro.setProperty("log4j.rootLogger", logLevel.toLowerCase() + ", stdout, file");
-            }
-        }
-
-        // Redirect log messages to console
-        pro.setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
-        pro.setProperty("log4j.appender.stdout.Target", "System.out");
-        pro.setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");
-        pro.setProperty("log4j.appender.stdout.layout.ConversionPattern", "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
-
-        // Redirect log messages to a log file, support file rolling.
-        pro.setProperty("log4j.appender.file", "org.apache.log4j.DailyRollingFileAppender");
-        pro.setProperty("log4j.appender.file.File", "/Users/Wachirawat/Desktop/PresentationEM/Build/SuperInnovaStatEngine/log/" + logName + ".error");
-        // pro.setProperty("log4j.appender.file.File", "/opt/elementManagement/log/" + logName +".error");
-        pro.setProperty("log4j.appender.file.DatePattern", "'.'yyyy-MM-dd");
-        pro.setProperty("log4j.appender.file.layout", "org.apache.log4j.PatternLayout");
-        pro.setProperty("log4j.appender.file.layout.ConversionPattern", "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
-        PropertyConfigurator.configure(pro);
     }
 }

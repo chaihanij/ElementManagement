@@ -4,19 +4,11 @@
  */
 package vos1.superinnova.engine.statsummarizer;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Properties;
-
 import org.apache.log4j.Logger;
-import vos1.superinnova.engine.statproccessor.Common;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatProcessor;
-import vos1.superinnova.engine.statsummarizer.templates.SupernovaMultiSuccessRateSummarizationModule;
-import vos1.superinnova.engine.statsummarizer.templates.SupernovaRegexFilterizationModule;
-import vos1.superinnova.engine.statsummarizer.templates.SupernovaStatAddSubtractModule;
-import vos1.superinnova.engine.statsummarizer.templates.SupernovaStatCategorizationModule;
-import vos1.superinnova.engine.statsummarizer.templates.SupernovaSuccessRateSummarizationModule;
+import vos1.superinnova.engine.statsummarizer.templates.*;
+
+import java.util.Properties;
 
 
 /**
@@ -49,13 +41,13 @@ public class StatSummarizationCore {
                 // Switch Type
                 try {
                     this.statSummarizationModuleArray[i] = createStatSummarizationModuleFromConfiguration(this.statSummarizerConfigurationArray[i]);
-                    logger.info("StatSummarization name " + this.statSummarizerConfigurationArray[i].getStatName() + ". module = " +  this.statSummarizerConfigurationArray[i].getClass());
+                    logger.info("StatSummarization name " + this.statSummarizerConfigurationArray[i].getStatName() + " module " + this.statSummarizerConfigurationArray[i].getSummarizationModule());
 //                  System.out.println("PUT "+this.statSummarizerConfigurationArray[i].getStatName()+", index : "+new Integer(i));
                     statSummarizerNameMap.put(this.statSummarizerConfigurationArray[i].getStatName(), new Integer(i));
                 } catch (Exception e) {
                     logger.error(e);
                 }
-                //darkMetamorphosis
+
             }
         }
     }
@@ -96,6 +88,8 @@ public class StatSummarizationCore {
     public void invokeStatSummarizationProcess() {
         for (int i = 0; i < this.statSummarizerConfigurationArray.length; i++) {
             // Switch Type
+
+            logger.info("Statistics summarization on module " + this.statSummarizationModuleArray[i].statSummarizerConfiguration.summarizationModule);
             this.statSummarizationModuleArray[i].startStatSummarizationProcess();
         }
         // Code Here

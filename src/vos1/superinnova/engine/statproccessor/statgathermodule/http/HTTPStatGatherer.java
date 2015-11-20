@@ -24,6 +24,7 @@ public class HTTPStatGatherer extends StatGatherer{
         this.gathererStatus=StatGatherer.STATUS_STARTED;
         try{
             this.gatherOutput=HTTPReader.openConnection(this.url);
+            logger.debug("Output [" + this.gatherOutput + "]");
             //System.out.println(this.gatherOutput);
         }
         catch(Exception e){

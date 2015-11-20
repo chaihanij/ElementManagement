@@ -106,7 +106,7 @@ public class SuperInnovaStatParser extends StatGathererParser {
             int i = 0;
             while ((line = reader.readLine()) != null) {
                 //System.out.println("line : "+line);
-                if (line.length() == 0 || line.trim().startsWith("TIME") || line.trim().startsWith("End")) {
+                if (line.length() == 0 || line.trim().startsWith("TIME") || line.trim().startsWith("End") || line.trim().startsWith("START")) {
                     continue;
                 }
                 if (i > 0) {
@@ -148,7 +148,7 @@ public class SuperInnovaStatParser extends StatGathererParser {
             //System.out.println("sql : "+sqlStringBuffer.toString());
 
         } catch (Exception e) {
-            logger.error("Command insert : " + sqlStringBuffer.toString());
+            logger.error("Parser data error [" + sqlStringBuffer.toString() + "]");
             logger.error(e);
             return null;
         }

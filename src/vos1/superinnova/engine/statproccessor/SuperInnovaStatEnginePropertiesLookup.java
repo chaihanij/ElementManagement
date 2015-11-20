@@ -11,7 +11,9 @@ import java.util.Properties;
  * @author HugeScreen
  */
 public class SuperInnovaStatEnginePropertiesLookup {
+
     public static final int DEFUALT_CATEGORY_PROPERTIES_SIZE=128;
+
     Properties[] propertiesList=null;
     
     Properties categoryProperties=null;

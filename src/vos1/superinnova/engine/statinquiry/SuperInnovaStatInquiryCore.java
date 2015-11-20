@@ -4,9 +4,10 @@
  */
 package vos1.superinnova.engine.statinquiry;
 
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
+
+import java.util.Properties;
 
 /**
  *
@@ -24,7 +25,7 @@ public class SuperInnovaStatInquiryCore {
         if(this.superInnovaStatCore!=null){
             Properties superInnovaStatInquiryCoreConfiguration = this.superInnovaStatCore.getEngineCoreConfiguration();
             String inquiryPortString=superInnovaStatInquiryCoreConfiguration.getProperty("STAT_INQUIRY_PORT");
-            logger.info("STAT_INQUIRY_PORT Port:"+ inquiryPortString );
+            logger.info("STAT_INQUIRY_PORT Port:" + inquiryPortString );
             String[] inquiryPortStringArray=inquiryPortString.split("\\|");
             superInnovaStatInquiryServerArray = new SuperInnovaStatInquiryServer[inquiryPortStringArray.length];
             for(int i=0;i<inquiryPortStringArray.length;i++){

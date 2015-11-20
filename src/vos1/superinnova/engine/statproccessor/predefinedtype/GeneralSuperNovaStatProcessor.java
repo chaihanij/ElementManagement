@@ -4,12 +4,6 @@
  */
 package vos1.superinnova.engine.statproccessor.predefinedtype;
 
-import java.sql.ResultSet;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEnginePropertiesLookup;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatProcessor;
@@ -19,8 +13,12 @@ import vos1.superinnova.engine.statproccessor.statgathermodule.StatGathererExecu
 import vos1.superinnova.engine.statproccessor.statgathermodule.statparser.predefined.SuperInnovaStatParser;
 import vos1.superinnova.engine.statproccessor.statgathermodule.util.TimeUtil;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationCore;
-import vos1.superinnova.engine.statsummarizer.StatSummarizationModule;
-import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
+
+import java.sql.ResultSet;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author HugeScreen
@@ -154,7 +152,7 @@ public class GeneralSuperNovaStatProcessor extends SuperInnovaStatProcessor {
 
     @Override
     public void beginStatSummarizationProcess() {
-        logger.debug("Begine : STAT SUMMARIZATION PROCESS");
+        logger.debug("BEGIN STAT SUMMARIZATION PROCESS");
         this.statSummarizationCore.invokeStatSummarizationProcess();
     }
 }
