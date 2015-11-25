@@ -1,0 +1,242 @@
+#!/bin/bash
+###############################################################################
+#-----------------------------------------------------------------------------#
+# Version Descriptions                                                      #
+# 1.0.0	  Init script for start stop restart and view status appliation.    #
+# 1.0.1	  Edit log path
+###############################################################################
+VERSION="1.0.1"
+func_name="main"
+BASE="/opt/elementManagement"
+
+ROOT="${BASE}/utils"
+TEMP="${BASE}/utils/.temp"
+TEMPINIT=${BASE}/tmp/.em_`date +%Y%m%d`.log
+
+BASE_LOG="${BASE}/log"
+BASE_BIN_EM="${BASE}/bin/em.jar"
+BASE_CONF="${BASE}/conf"
+
+SERVICE=
+COMMAND=
+
+CONFIG_PATH=
+
+LOGLEVEL="INFO"
+
+################### Colour ############################################
+# Declare and initialize colour                                       #
+#######################################################################
+FRED="\033[1;31m"
+FGRE="\033[1;32m"
+FYEL="\033[1;33m"
+FBLU="\033[1;34m"
+FPIN="\033[1;35m"
+FCYN="\033[1;36m"
+FWHI="\033[2;37m"
+
+BRED="\033[1;41m"
+BGRE="\033[1;42m"
+BYEL="\033[1;43m"
+BBLU="\033[1;44m"
+BPIN="\033[1;45m"
+BCYN="\033[1;36m"
+BWHI="\033[1;47m"
+CDEF="\033[0m"
+
+TXTF="\033[5m"
+TXTU="\033[4m"
+TXTB="\033[1m"
+
+HISTORY="${@:1}"
+
+usage () {
+
+    echo "Usage:"
+    echo "    em version ${VERSION} - This script for start stop restart and view status appliction element management."
+    echo "    em [SERVICE_NAME] COMMAND"
+    echo "  Commands:"
+    echo "    start      Start application element management."
+    echo "    stop       Stop applicaiont element management."
+    echo "    restart    Restart applicaiont element management."
+    echo "    status     View status appliction element management."
+
+}
+
+#################### EM log ###########################################
+# Parameter                                                           #
+#  $1 -> Log Level which comprise INFO, DEBUG, WARN, ERROR and FATAL. #
+#  $2 -> Description of log                                           #
+#######################################################################
+function em_log (){
+    if [ "$1" == "ECHO" ];then
+        echo -e "${@:2}"
+    elif [ "$1" == "PRINT" ];then
+        echo -e "${@:2}"|tee -a ${TEMPINIT}
+    elif [ "$1" == "WRITE" ];then
+        echo "${@:2}">> ${TEMPINIT}
+    elif [ "$1" == "INFO" ];then
+        if [ "$VERBOSE_ENABLE" == "1" ];then
+            echo -e "[${FGRE}$1${CDEF}|`date '+%Y%m%d|%T'`|${@:2}]" 
+        else
+            echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]" >> ${TEMPINIT}
+        fi
+    elif [ "$1" == "DEBUG" ];then
+        if [ "$DEBUG_ENABLE" == "1" -o "$VERBOSE_ENABLE" == "1" ];then
+            echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]" >> ${TEMPINIT}
+            echo -e "[${FGRE}$1${CDEF}|`date '+%Y%m%d|%T'`|${@:2}]"
+            #echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]"|tee -a ${TEMPINIT}
+        else
+            echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]" >> ${TEMPINIT}
+        fi
+    elif [ "$1" == "WARN" ];then
+        echo -e "[${FYEL}WARNNING${CDEF}|`date '+%Y%m%d|%T'`|${@:2}]"
+        echo "[WARNNING|`date '+%Y%m%d|%T'`|${@:2}]" >> ${TEMPINIT}
+        #echo "[WARNNING|`date '+%Y%m%d|%T'`|${@:2}]"|tee -a ${TEMPINIT}
+    elif [ "$1" == "ERROR" ];then
+        echo -e "[${FRED}$1${CDEF}|`date '+%Y%m%d|%T'`|${@:2}]"
+        echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]"  >> ${TEMPINIT}
+        #echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]"|tee -a ${TEMPINIT}
+    elif [ "$1" == "FATAL" ];then
+        echo -e "[${FRED}$1${CDEF}|`date '+%Y%m%d|%T'`|${@:2}]"
+        echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]"  >> ${TEMPINIT}
+       # echo "[$1|`date '+%Y%m%d|%T'`|${@:2}]"|tee -a ${TEMPINIT}
+    fi
+}
+
+ip=`who -a|awk '{print $NF}'`
+em_log "WRITE" ""
+em_log "WRITE" "[START]"
+em_log "INFO" "$func_name|$LINENO|Remote from$ip"
+em_log "INFO" "$func_name|$LINENO|command[em ${HISTORY}]"
+
+while [ "$1" ]
+do
+    if [ "$1" == "-l" ] ; then
+        if [ "$2" == "FATAL" -o "$2" == "ERROR" -o "$2" == "INFO" -o  "$2" == "WARN" -o  "$2" == "DEBUG" ] ; then
+            LOGLEVEL=$2
+        fi
+        shift 2
+    else
+		break;
+	fi
+done
+
+function check_process () {
+    func_name="check_process"
+    em_log "INFO" "CHECK PROCESSS"
+    RESULT=""
+    RESULT=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep ${CONF_PATH} |grep -v grep|awk '{print $2}'`
+    em_log "DEBUG" "[RESULT] ${RESULT}"
+    echo  "${RESULT}"
+}
+
+function check_servicepath () {
+    func_name="check_servicepath"
+    #PATH=`ls -al ${BASE_CONF}|grep -R "${SERVICE}$"|grep -v grep||awk '{print $NF}'`
+    #CONF_PATH="${BASE_CONF}/${SERVICE}"
+    if [ ! -d "${CONF_PATH}" ] ; then
+        echo -e "Element management service ${FRED}${SERVICE}${CDEF} not found."
+        exit -1
+    else
+        MAIN_CONF=`ls -l ${CONF_PATH}|grep -R "mainConfiguration.conf"|grep -v grep|awk '{print $NF}'`
+        ENGINE_CONF=`ls -l ${CONF_PATH}|grep engineConfiguration`
+        if [ -z "${MAIN_CONF}" -a -z "${ENGINE_CONF}" ] ; then
+            echo -e "Please check configuration."
+            exit -1
+        fi
+    fi
+}
+
+function stop_process () {
+    func_name="stop_process"
+    read -p "Do you wish to stop?(y/n)" ANSWER
+    if [ "${ANSWER}" = "y" ] ; then
+        echo "" > /dev/null
+    else
+        echo -e "Closedown abandoned..."
+        em_log "WRITE" "[END]"
+        exit -1
+    fi
+    CHECK_PROCESS=$(check_process)
+    if [ ! -z "${CHECK_PROCESS}" -a "${CHECK_PROCESS}" != " " ] ; then
+        kill ${CHECK_PROCESS}
+        em_log "INFO" "Kill process Element management for service ${SERVICE}, process id ${CHECK_PROCESS}"
+        sleep 3
+        CHECK=$(check_process)
+        if [ "${CHECK}" == "" ]; then
+            echo -e "Element management for ${FBLU}${SERVICE}${CDEF} stop ${FGRE}Success${CDEF}"
+            em_log "INFO" "Kill process Element management for service ${SERVICE}, process id ${CHECK}"
+        fi
+    else
+        echo -e "Element management for ${FBLU}${SERVICE}${CDEF} is ${FRED}not running !!${CDEF}"
+        em_log "INFO" "Element management for service ${SERVICE} is not running"
+    fi
+}
+
+function start_process () {
+
+    func_name="start_process"
+    check_servicepath
+    CHECK_PROCESS=$( check_process )
+    if [ ${CHECK_PROCESS} ] ; then
+        echo -e "Element management for ${FBLU}${SERVICE}${CDEF} is still ${FRED}running !!!${CDEF}"
+        stop_process
+    fi
+    LOG_FILE="${BASE_LOG}/${SERVICE}.log"
+    `java -jar ${BASE_BIN_EM} ${CONF_PATH} ${SERVICE} ${LOGLEVEL} >> ${LOG_FILE} 2>&1` &
+    CHECK=$(check_process)
+    if [ "${CHECK}" != ""  ] ; then
+        echo -e "Element management for ${FBLU}${SERVICE}${CDEF} start ${FGRE}Success${CDEF}"
+        em_log "INFO" "Element management for ${SERVICE} start, process id [${CHECK}]."
+    else
+        echo -e "Element management for ${FBLU}${SERVICE}${CDEF} start ${FRED}Fail${CDEF}"
+    fi
+}
+
+function restart_process () {
+    func_name="restart_process"
+    stop_process
+    start_process
+}
+
+function status_process () {
+    func_name="status_process"
+    PROCESS_A=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep ${CONF_PATH} |grep -v grep|awk '{print $2}'`
+    PROCESS_B=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep ${CONF_PATH} |grep -v grep|awk '{print $3}'`
+
+    if [ "$PROCESS_A" != "" -a "$PROCESS_B" != "" ] ; then
+        echo -e "Element management service ${SERVICE},  process id (${PROCESS_A})(${PROCESS_B})."
+    else
+        echo -e "Element management service ${SERVICE} stop."
+    fi
+}
+
+if [ $# -eq 2 ] ; then
+    SERVICE=${1}
+    COMMAND=${2}
+    CONF_PATH="${BASE_CONF}/${SERVICE}"
+    em_log "DEBUG" "[SERVICE] : ${SERVICE}"
+    em_log "DEBUG" "[COMMAND] : ${COMMAND}"
+    em_log "DEBUG" "[CONFIG_PATH] : ${CONFIG_PATH}"
+else
+    usage
+fi
+
+if [ "${COMMAND}" == "stop" ] ; then
+    stop_process
+elif [ "${COMMAND}" == "start" ] ; then
+    start_process
+elif [ "${COMMAND}" == "restart" ] ; then
+    restart_process
+elif [ "${COMMAND}" == "status" ] ; then
+    status_process
+elif [ "${COMMAND}" == "check" ] ; then
+    check_process
+else
+    em_log "ECHO" "Unknown command"
+fi
+
+em_log "WRITE"  "[END]"
+
+exit 0
