@@ -92,7 +92,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         int siteSize = siteProp.size() - 1;
         int blockSize = blockProp.size() - 1;
         int subBlockSize = subBlockProp.size() - 1;
-//        System.out.println("siteSize : "+siteSize+", blockSize : "+blockSize+", subBlockSize :"+subBlockSize);
+
         siteLevelLocationArray = new int[siteSize];
         blockLevelLocationArray = new int[blockSize];
         subBlockLevelLocationArray = new int[subBlockSize];
@@ -106,7 +106,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
 
         clearCounter();
         //this.row=siteProp.stringPropertyNames().size()+blockProp.stringPropertyNames().size()+subBlockProp.stringPropertyNames().size()+1;
-
     }
 
     public void clearCounter() {
@@ -364,7 +363,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
 
     @Override
     public void dumpDataSet() {
-        System.out.println(this.dumpToString());
+        logger.debug(this.dumpToString());
     }
 
 
@@ -374,7 +373,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             sb.append(",");
             sb.append(siteBlockSubBlockArray[i]);
         }
-        System.out.println("SBS [ " + sb.toString() + " ]");
+        logger.debug("SBS [ " + sb.toString() + " ]");
         switch (prefixIdentifier) {
             case StatSummarizationSmartResultSet.MAP_SITE:
                 return (String) this.statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().get(GeneralSuperInnovaStatEngine.SITE_REVERSE_KEYWORD, siteBlockSubBlockArray[StatSummarizationSmartResultSet.MAP_SITE]);
@@ -525,8 +524,9 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             int[] resultSet = null;
             int resultSetCounter = 0;
 
-            //System.out.println("level : "+level);
+            logger.debug("level : " + level);
             int[] locationMapper = null;
+
             if (level.compareToIgnoreCase("site") == 0) {
                 resultSet = this.siteLevelLocationArray;
                 mapLevel = StatSummarizationSmartResultSet.MAP_SITE;
@@ -611,13 +611,13 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                 */
 
                 for (int i = 0; i < resultSet.length; i++) {
-
+                    logger.debug( "resultSet["+ i + "]" + resultSet[i]);
                     if (identifierArray != null && i > resultSetCounter) {
                         break;
                     }
 
                     if (resultSet[i] < 0) {
-                        //System.out.println("resultSet["+i+"] : "+resultSet[i]+", Less Than Zero");
+                        logger.error("resultSet["+i+"] : "+resultSet[i]+", Less Than Zero");
                         continue;
                     }
 
@@ -657,6 +657,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                     }
 
                     channelName = this.getIdentifier(siteBlockSubBlockArray);
+                    logger.debug(channelName);
                     try {
                         int nameCounter = 0;
                         StringBuilder channelNameBuilder = new StringBuilder();
@@ -685,10 +686,9 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                             nameCounter++;
                         }
                         channelName = channelNameBuilder.toString();
-                        //System.out.println("**modify channelName : "+channelName);
-
+                        logger.debug("Channel" + channelName);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        logger.error(e);
                     }
 
 
@@ -758,7 +758,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                         prtgOutput.append("</channel>");
                         // Value
                         if (j == this.columnName.length - 1) {
-                            System.out.println("hCounter: " + (Integer) lastestDataSet[i][j]);
+                            logger.info("hCounter: " + (Integer) lastestDataSet[i][j]);
                         }
 
                         prtgOutput.append("<value>");

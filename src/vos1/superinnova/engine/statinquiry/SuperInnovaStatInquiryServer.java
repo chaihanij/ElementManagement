@@ -11,7 +11,6 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import vos1.superinnova.engine.statproccessor.GlobalVariable;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
 
 /**
@@ -34,52 +33,54 @@ public class SuperInnovaStatInquiryServer extends Thread {
     public void run() {
         try {
             startServer();
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error(e);
         }
     }
 
     public void startServer() throws Exception {
 
-            Server server = new Server(this.portNumber);
+        Server server = new Server(this.portNumber);
 
-            HandlerCollection handlers = new HandlerCollection();
+        HandlerCollection handlers = new HandlerCollection();
 
-            ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-            context.setContextPath("/");
-            handlers.addHandler(context);
+        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
+        context.setContextPath("/");
+        handlers.addHandler(context);
 
 //        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + System.getProperty("file.separator") + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
-//            String pwdDEV = "/Users/Wachirawat/Desktop/PresentationEM/Build/SuperInnovaStatEngine/log/";
-            String _accessLogPath = GlobalVariable.BASE_LOG_PATH + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
-            logger.info("access log path " + _accessLogPath);
+        //        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
 
-            NCSARequestLog requestLog = new NCSARequestLog();
-            requestLog.setFilename(_accessLogPath);
-            requestLog.setFilenameDateFormat("yyyy_MM_dd");
-            requestLog.setRetainDays(90);
-            requestLog.setAppend(true);
-            requestLog.setExtended(true);
-            requestLog.setLogCookies(false);
-            requestLog.setLogTimeZone("GMT+7");
+        String pwdDEV = "/Users/Wachirawat/Desktop/PresentationEM/Build/SuperInnovaStatEngine/log/";
+        String _accessLogPath = pwdDEV + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
 
-            RequestLogHandler requestLogHandler = new RequestLogHandler();
-            requestLogHandler.setRequestLog(requestLog);
-            handlers.addHandler(requestLogHandler);
+        logger.info("access log path " + _accessLogPath);
 
-            // Add Inquiry Servlet
-            SuperInnovaStatInquiryHttpServlet superInnovaStatInquiryHttpServlet = new SuperInnovaStatInquiryHttpServlet(this.superInnovaStatCore);
-            LoglevelHttpServlet loglevelHttpServlet = new LoglevelHttpServlet();
-            context.addServlet(new ServletHolder(superInnovaStatInquiryHttpServlet), "/inquiryStat/*");
-            context.addServlet(new ServletHolder(loglevelHttpServlet), "/utils/*");
+        NCSARequestLog requestLog = new NCSARequestLog();
+        requestLog.setFilename(_accessLogPath);
+        requestLog.setFilenameDateFormat("yyyy_MM_dd");
+        requestLog.setRetainDays(90);
+        requestLog.setAppend(true);
+        requestLog.setExtended(true);
+        requestLog.setLogCookies(false);
+        requestLog.setLogTimeZone("GMT+7");
 
-            server.setHandler(handlers);
+        RequestLogHandler requestLogHandler = new RequestLogHandler();
+        requestLogHandler.setRequestLog(requestLog);
+        handlers.addHandler(requestLogHandler);
 
-            server.start();
-            server.join();
+        // Add Inquiry Servlet
+        SuperInnovaStatInquiryHttpServlet superInnovaStatInquiryHttpServlet = new SuperInnovaStatInquiryHttpServlet(this.superInnovaStatCore);
+        LoglevelHttpServlet loglevelHttpServlet = new LoglevelHttpServlet();
+        context.addServlet(new ServletHolder(superInnovaStatInquiryHttpServlet), "/inquiryStat/*");
+        context.addServlet(new ServletHolder(loglevelHttpServlet), "/utils/*");
+
+        server.setHandler(handlers);
+
+        server.start();
+        server.join();
 
     }
-
 
 
 }
