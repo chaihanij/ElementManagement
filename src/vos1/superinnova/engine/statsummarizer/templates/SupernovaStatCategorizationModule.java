@@ -23,11 +23,13 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
     String[] columnName = null;
     String[] unitType = null;
     int[] divideBy = null;
+    int[] AverageTime = null;
     int aggregrateType = StatSummarizationSmartResultSet.OPERATION_ADD;
     int row = 0;
 
-
     String[][] inputSRegexParam = null;
+
+
     /*
     public static final int REGEX_PARAM_ATTEMPT=0;
     public static final int REGEX_PARAM_SUCCESS=1;
@@ -61,9 +63,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
         Properties siteProp = statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SITE_KEYWORD);
         Properties blockProp = statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.BLOCK_KEYWORD);
         Properties subBlockProp = statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SUBBLOCK_KEYWORD);
-//        System.out.println("Site members : "+siteProp.size());
-//        System.out.println("Block members : "+blockProp.size());
-//        System.out.println("Site members : "+subBlockProp.size());
+
         this.row = siteProp.size() - 1 + blockProp.size() - 1 + subBlockProp.size() - 1;
 
         // Initailize SupernovaStatCategorizationModule
@@ -111,6 +111,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
         unitType = new String[this.categorySize + 1];
         inputSRegexParam = new String[this.categorySize + 1][];
         divideBy = new int[this.categorySize + 1];
+        AverageTime = new int[this.categorySize + 1];
         //aggregateType = new int[this.categorySize+1];
         for (int i = 0; i < this.categorySize; i++) {
             String runningNumber = String.format("%02d", i + 1);
@@ -128,13 +129,30 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
 
             if (statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_divideBy") != null) {
                 try {
-                    divideBy[i] = Integer.parseInt(statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_divideBy"));
+                    divideBy[i] = Integer.parseInt(statSummarizerConfiguration
+                            .getAdditionalProperties()
+                            .getProperty("param_category_" + runningNumber + "_divideBy"));
                 } catch (Exception e) {
                     logger.warn("divideBy[" + i + "]" + "error and set value = 1");
                     divideBy[i] = 1;
                     //e.printStackTrace();
                 }
             }
+//            AverageTime
+            try {
+                if (getStatSummarizerConfiguration().getAdditionalProperties().getProperty("param_category_" + runningNumber + "_AverageTime") != null) {
+                    AverageTime[i] = Integer.parseInt(getStatSummarizerConfiguration()
+                            .getAdditionalProperties()
+                            .getProperty("param_category_" + runningNumber + "_AverageTime"));
+                } else {
+                    AverageTime[i] = 1;
+                }
+            } catch (Exception e) {
+//                AverageTime
+                AverageTime[i] = 1;
+                logger.error("param_category_" + runningNumber + "_AverageTime error : " + e);
+            }
+
         }
 
         // Last Column is Node Count
@@ -190,9 +208,16 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
     public void summarizeResultSet(ResultSet resultSet) {
 
 
-        StatSummarizationSmartResultSet tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore, this.row, this.metaData, this.columnName, this.unitType);
+        StatSummarizationSmartResultSet tmpStatSummarizationSmartResultSet = null;
+        tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,
+                this.row,
+                this.metaData,
+                this.columnName,
+                this.unitType);
 
         try {
+            logger.debug("Category size = " + this.categorySize);
+
             for (; resultSet.next(); ) {
                 // Check Date
                 Timestamp dateTimeStamp = resultSet.getTimestamp(1 + SupernovaSuccessRateSummarizationModule.COL_DATE);
@@ -209,20 +234,16 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                 String statName = (String) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_STATNAME);
                 //System.out.println("StatName : "+statName);
                 boolean foundMatchesRegex = false;
-                // Loop Category
+
                 for (int i = 0; i < this.categorySize; i++) {
                     //System.out.println("Loop : '"+columnName[i]+"' searching for matches pattern.");
                     // Loop Detected From StatName
                     for (int j = 0; j < this.inputSRegexParam[i].length; j++) {
-                        //System.out.println("i:"+i+", j:"+j);
-                            
-                            /*
-                                int a=(Integer)resultSet.getObject(1+SupernovaSuccessRateSummarizationModule.COL_SITE);
-                                int b=(Integer)resultSet.getObject(1+SupernovaSuccessRateSummarizationModule.COL_BLOCK);
-                                int c=(Integer)resultSet.getObject(1+SupernovaSuccessRateSummarizationModule.COL_SUBBLOCK);                            
-                            System.out.println(String.format("does '%s' matches '%s' ?, from %02d, %02d, %02d",this.inputSRegexParam[i][j], statName,a,b,c));
-                            */
+//                        logger.debug("Category["+i +"]  " +  "Detect stat size = " + this.inputSRegexParam[i].length);
+
                         if (statName.matches(this.inputSRegexParam[i][j]) == true) {
+//                            logger.debug(this.inputSRegexParam[i][j] + "==" + statName);
+
                             //System.out.println("matcher : i:"+i+", j:"+j);
                             //ystem.out.println(" - Matched");
                             //System.out.println(statName+", "+REGEX_PARAM_NAME[i]);
@@ -238,21 +259,24 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
 
                             //resultSet Start with 1, So we need to add 1 to Column Position
                             Object obj = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUMCOUNTER);
-//                            logger.debug(String.format("putx : %d, %d, %d, %d, %d, %s",site,block,subBlock,i,operation,obj));
+
+//                          logger.debug(String.format("putx : %d, %d, %d, %d, %d, %s",site,block,subBlock,i,operation,obj));
                             // Calulate TPS
                             if (divideBy[i] > 1) {
                                 switch (metaData[i]) {
                                     case StatSummarizationResultSet.TYPE_INT:
                                         // === Strat Round Up Process =============
                                         Integer obj_before = (Integer) obj;
-                                        obj = (Integer) (obj_before / divideBy[i]);
+                                        obj = obj_before / divideBy[i];
                                         try {
                                             float tryFloatValue = 0;
-                                            tryFloatValue = (Integer) obj_before / (float) divideBy[i];
+                                            tryFloatValue = obj_before / (float) divideBy[i];
                                             Double tmpDoubleValue = Math.ceil(tryFloatValue);
                                             //System.out.println("INTEGER : tryFloatValue : "+tryFloatValue+", tmpDoubleValue : "+tmpDoubleValue);
                                             obj = tmpDoubleValue.intValue();
+
                                         } catch (Exception e) {
+                                            logger.error(e);
                                             //if This is Float
                                             //e.printStackTrace();
                                         }
@@ -262,11 +286,11 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
 
                                         // === Strat Round Up Process =============
                                         Long long_obj_before = (Long) obj;
-                                        obj = (Long) ((Long) obj / divideBy[i]);
+                                        obj = (Long) obj / divideBy[i];
                                         try {
                                             double tryFloatValue = 0;
                                             //System.out.println(long_obj_before+" Divided by "+divideBy[i]);
-                                            tryFloatValue = ((Long) long_obj_before) / (float) divideBy[i];
+                                            tryFloatValue = long_obj_before / (float) divideBy[i];
                                             //System.out.println("beforeMath.ceil : "+tryFloatValue);
                                             Double tmpDoubleValue = Math.ceil(tryFloatValue);
                                             //System.out.println("AfterMath.ceil : "+tmpDoubleValue);
@@ -274,29 +298,108 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                                             obj = tmpDoubleValue.longValue();
                                             //System.out.println("LONG : obj : "+obj+", : "+(Long)obj);
                                         } catch (Exception e) {
-                                            //if This is Float
-                                            //e.printStackTrace();
+                                            logger.error(e);
                                         }
-                                        // === End Round Up Process =============
                                         break;
                                     case StatSummarizationResultSet.TYPE_FLOAT:
-                                        obj = (Float) ((Float) obj / divideBy[i]);
+                                        obj = (Float.parseFloat(obj.toString())) / divideBy[i];
                                         break;
                                     case StatSummarizationResultSet.TYPE_DOUBLE:
-                                        obj = (Double) ((Double) obj / divideBy[i]);
+                                        obj = (Double.parseDouble(obj.toString())) / divideBy[i];
                                         break;
                                 }
                             }
-                            logger.debug(String.format("putObject(%d, %d, %d, %d, %d, %s)", site, block, subBlock, i, operation, obj));
+
+                            Object min = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_MINCOUNTER);
+                            Object max = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_MAXCOUNTER);
+
+//                            logger.debug("AverageTime[" + i + "]" + AverageTime[i]);
+                            try {
+                                if (AverageTime[i] > 1) {
+                                    switch (metaData[i]) {
+                                        case StatSummarizationResultSet.TYPE_INT:
+                                            try {
+                                                Integer intBeforeMin = Integer.parseInt(min.toString());
+                                                min = intBeforeMin / AverageTime[i];
+
+                                                Integer intBeforeMax = Integer.parseInt(max.toString());
+                                                max = intBeforeMax / AverageTime[i];
+
+                                                // min
+                                                float tryFloatValueMin = 0;
+                                                tryFloatValueMin = intBeforeMin / (float) AverageTime[i];
+                                                Double tmpDoubleValueMin = Math.ceil(tryFloatValueMin);
+                                                min = tmpDoubleValueMin.intValue();
+
+                                                // max
+                                                float tryFloatValueMax = 0;
+                                                tryFloatValueMax = intBeforeMax / (float) AverageTime[i];
+                                                Double tmpDoubleValueMax = Math.ceil(tryFloatValueMax);
+                                                max = tmpDoubleValueMax.intValue();
+
+                                            } catch (Exception e) {
+                                                logger.error("TYPE_INT" + e);
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_LONG:
+                                            try {
+                                                Long longBeforeMin = Long.parseLong(min.toString());
+                                                min = longBeforeMin / AverageTime[i];
+
+                                                Long longBeforeMax = Long.parseLong(max.toString());
+                                                max = longBeforeMax / AverageTime[i];
+
+                                                double tryFloatValueMin = 0;
+                                                tryFloatValueMin = longBeforeMin / (float) AverageTime[i];
+                                                Double tmpDoubleValueMin = Math.ceil(tryFloatValueMin);
+                                                min = tmpDoubleValueMin.longValue();
+
+                                                double tryFloatValueMax = 0;
+                                                tryFloatValueMax = longBeforeMax / (float) AverageTime[i];
+                                                Double tmpDoubleValueMax = Math.ceil(tryFloatValueMax);
+                                                max = tmpDoubleValueMax.longValue();
+
+                                            } catch (Exception e) {
+                                                logger.error("TYPE_LONG :" + e);
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_FLOAT:
+                                            try {
+                                                min = (Float.parseFloat(min.toString())) / AverageTime[i];
+                                                max = (Float.parseFloat(max.toString())) / AverageTime[i];
+                                            } catch (Exception e) {
+                                                logger.error("TYPE_FLOAT :" + e);
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_DOUBLE:
+                                            try {
+                                                min = (Double.parseDouble(min.toString())) / AverageTime[i];
+                                                max = (Double.parseDouble(max.toString())) / AverageTime[i];
+                                            } catch (Exception e) {
+                                                logger.error("TYPE_DOUBLE :" + e);
+                                            }
+                                            break;
+                                    }
+                                }
+                            } catch (Exception e) {
+                                logger.error(e);
+                            }
+
                             tmpStatSummarizationSmartResultSet.putObject(site, block, subBlock, i, operation, obj);
+                            tmpStatSummarizationSmartResultSet.putMinObject(site, block, subBlock, i, 5, min);
+                            tmpStatSummarizationSmartResultSet.putMaxObject(site, block, subBlock, i, 4, max);
+
+
                             if (!this.redundancy) {
                                 foundMatchesRegex = true;
                                 break;
                             }
                         }
+                        // Check if foundMatchesRegex
                         if (!this.redundancy) {
-                            foundMatchesRegex = true;
-                            break;
+                            if (foundMatchesRegex == true) {
+                                break;
+                            }
                         }
                     }
                     // Check if foundMatchesRegex
@@ -307,11 +410,8 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                     }
                 }
             }
-                /*
-                for (; resultSet.next(); ) {
-                    System.out.println("")
-                }
-                */
+
+
             for (int i = 0; i < tmpStatSummarizationSmartResultSet.getRowCounter(); i++) {
                 // Determine Host Counter
                 Integer hostCounter = -1;
@@ -321,12 +421,35 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                         hostCounter = tmpStatSummarizationSmartResultSet.getHostListProp(j, siteBlockSubBlockArray[j]).size();
                     }
                 }
-                logger.debug("putObject: row =" + i + ", column =" + this.categorySize + ", hostCounter =" + hostCounter);
                 tmpStatSummarizationSmartResultSet.putObject(i, this.categorySize, hostCounter);
             }
-            //statSummarizationSmartResultSet.dumpDataSet();
+
+            for (int i = 0; i < tmpStatSummarizationSmartResultSet.getMinRowCounter(); i++) {
+                // Determine Host Counter
+                Integer hostMin = -1;
+                Integer[] siteBlockSubBlockArray = tmpStatSummarizationSmartResultSet.getSiteBlockSubBlockMappingFromMinRowNumber(i);
+                for (int j = 0; j < siteBlockSubBlockArray.length; j++) {
+                    if (siteBlockSubBlockArray[j] != null) {
+                        hostMin = tmpStatSummarizationSmartResultSet.getHostMinListProp(j, siteBlockSubBlockArray[j]).size();
+                    }
+                }
+                tmpStatSummarizationSmartResultSet.putMinObject(i, this.categorySize, hostMin);
+            }
+
+            for (int i = 0; i < tmpStatSummarizationSmartResultSet.getMaxRowCounter(); i++) {
+                // Determine Host Counter
+                Integer hostMax = -1;
+                Integer[] siteBlockSubBlockArray = tmpStatSummarizationSmartResultSet.getSiteBlockSubBlockMappingFromMaxRowNumber(i);
+                for (int j = 0; j < siteBlockSubBlockArray.length; j++) {
+                    if (siteBlockSubBlockArray[j] != null) {
+                        hostMax = tmpStatSummarizationSmartResultSet.getHostMaxListProp(j, siteBlockSubBlockArray[j]).size();
+                    }
+                }
+                tmpStatSummarizationSmartResultSet.putMaxObject(i, this.categorySize, hostMax);
+            }
             this.statSummarizationSmartResultSet = tmpStatSummarizationSmartResultSet;
         } catch (Exception e) {
+            logger.error("statSummarizationSmartResultSet = null");
             this.statSummarizationSmartResultSet = null;
             logger.error(e);
         }

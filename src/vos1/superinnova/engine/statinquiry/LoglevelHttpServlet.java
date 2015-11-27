@@ -27,9 +27,6 @@ public class LoglevelHttpServlet extends HttpServlet {
             "\tINFO\t\n" +
             "\tDEBUG\t\n";
 
-    public LoglevelHttpServlet() {
-
-    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

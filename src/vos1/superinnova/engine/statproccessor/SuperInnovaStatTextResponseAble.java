@@ -11,7 +11,7 @@ import java.util.Properties;
  * @author HugeScreen
  */
 public interface SuperInnovaStatTextResponseAble {
-    public String getTextResponse(String input);
-    public String getTextResponse(Properties inputParam);
+    String getTextResponse(String input);
+    String getTextResponse(Properties inputParam);
 
 }

@@ -5,7 +5,7 @@ package vos1.superinnova.engine.statproccessor;
  */
 public class GlobalVariable {
 
-    public static String VERSION_ID = "1.0.1";
+    public static String VERSION_ID = "1.0.2";
 
     public static String BASE_PATH = "/opt/elementManagement";
     public static String BASE_LOG_PATH = BASE_PATH + "/log/";

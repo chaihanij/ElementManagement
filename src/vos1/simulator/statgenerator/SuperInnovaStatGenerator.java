@@ -4,19 +4,19 @@
  */
 package vos1.simulator.statgenerator;
 
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Properties;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import vos1.superinnova.util.QueryStringUtil;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Properties;
 
 /**
  *
@@ -183,7 +183,7 @@ class SupperInnovaStatGeneratorServlet extends HttpServlet
                        min=0;
                    }
                    int max=average+(int)(Math.random()*10+1);
-                   int counter=(int)(average*((int)(Math.random()*5+1)));
+                   int counter= average*((int)(Math.random()*5+1));
                    //################################################
                    counter=2;
                    //################################################
@@ -277,7 +277,7 @@ class SupperInnovaStatGeneratorServlet extends HttpServlet
                        min=0;
                    }
                    int max=average+(int)(Math.random()*10+1);
-                   int counter=(int)(average*((int)(Math.random()*5+1)));
+                   int counter= average*((int)(Math.random()*5+1));
                    
                    String tmpStatName="mOCF Received Error SGSCP Charging Request ("+errorCode[i]+")";
                    String tmp=String.format("%s|%s|%s %s|%d|%d|%d|%d",sdf.format(new java.util.Date()),hostname,nodeType,tmpStatName,min,max,average,counter);
@@ -297,7 +297,7 @@ class SupperInnovaStatGeneratorServlet extends HttpServlet
                        min=0;
                    }
                    int max=average+(int)(Math.random()*10+1);
-                   int counter=(int)(average*((int)(Math.random()*5+1)));
+                   int counter= average*((int)(Math.random()*5+1));
                    
                    String tmpStatName="mOCF Received Error SGSCP Charging Request ("+errorCode[i]+")";
                    String tmp=String.format("%s|%s|%s %s|%d|%d|%d|%d",sdf.format(new java.util.Date()),hostname,nodeType,tmpStatName,min,max,average,counter);
@@ -316,7 +316,7 @@ class SupperInnovaStatGeneratorServlet extends HttpServlet
                        min=0;
                    }
                    int max=average+(int)(Math.random()*10+1);
-                   int counter=(int)(average*((int)(Math.random()*5+1)));
+                   int counter= average*((int)(Math.random()*5+1));
                    
                    String tmpStatName="mOCF Received Error DS2C Charging Request ("+errorCode[i]+")";
                    String tmp=String.format("%s|%s|%s %s|%d|%d|%d|%d",sdf.format(new java.util.Date()),hostname,nodeType,tmpStatName,min,max,average,counter);
@@ -335,7 +335,7 @@ class SupperInnovaStatGeneratorServlet extends HttpServlet
                        min=0;
                    }
                    int max=average+(int)(Math.random()*10+1);
-                   int counter=(int)(average*((int)(Math.random()*5+1)));
+                   int counter= average*((int)(Math.random()*5+1));
                    
                    String tmpStatName="mOCF Received Error AMF Charging Request ("+errorCode[i]+")";
                    String tmp=String.format("%s|%s|%s %s|%d|%d|%d|%d",sdf.format(new java.util.Date()),hostname,nodeType,tmpStatName,min,max,average,counter);

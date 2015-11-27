@@ -173,13 +173,9 @@ class StatGathererExecutorChild implements Runnable {
 
     public void run() {
         try {
-            long threadId = Thread.currentThread().getId();
-
-            logger.debug("Thread # " + threadId + " is doing this task");
 
             if (this.statGatherConfiguartion != null) {
-                logger.debug("Gather statistics");
-                logger.debug(statGatherConfiguartion.toString());
+                logger.debug("Gather statistics : " + statGatherConfiguartion.toString());
 
                 StatGatherer statGatherer = null;
                 String output = null;
@@ -201,10 +197,6 @@ class StatGathererExecutorChild implements Runnable {
                 if (statGathererParser != null && output != null) {
 
                     insertIntoRawTableSQL = statGathererParser.getInsertRawTableSQL(output, statGatherConfiguartion, this.statGathererExecutor.superInnovaStatProcessor.getSuperInnovaStatEnginePropertiesLookup());
-
-                    for (int i = 0; i < insertIntoRawTableSQL.length; i++) {
-                        logger.debug("SQL insert : [" + i + "] = " + insertIntoRawTableSQL[i]);
-                    }
 
                 }
                 if (insertIntoRawTableSQL != null && insertIntoRawTableSQL.length > 0) {

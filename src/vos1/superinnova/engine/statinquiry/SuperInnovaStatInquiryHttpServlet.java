@@ -56,12 +56,10 @@ public class SuperInnovaStatInquiryHttpServlet extends HttpServlet {
                             if (statSummarizationSmartResultSet != null) {
                                 response.getWriter().println(statSummarizationSmartResultSet.getPRTGOutput(queryString));
                             } else {
-                                logger.error("Error : statSummarizationSmartResultSet is null");
                                 response.getWriter().println("Error : statSummarizationSmartResultSet is null");
                             }
 
                         } else {
-                            logger.error("Not Found, StatName : " + statName);
                             response.getWriter().println("Not Found, StatName : " + statName);
                         }
                     } else {

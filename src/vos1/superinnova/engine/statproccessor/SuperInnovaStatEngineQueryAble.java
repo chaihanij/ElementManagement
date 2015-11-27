@@ -11,7 +11,7 @@ import java.sql.ResultSet;
  * @author HugeScreen
  */
 public interface SuperInnovaStatEngineQueryAble {
-    public void initDatabase();
-    public int updateDatabase(String sql);
-    public ResultSet queryDatabse(String sql);
+    void initDatabase();
+    int updateDatabase(String sql);
+    ResultSet queryDatabse(String sql);
 }

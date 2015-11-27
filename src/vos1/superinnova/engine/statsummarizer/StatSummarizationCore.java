@@ -91,6 +91,9 @@ public class StatSummarizationCore {
 
             logger.info("Statistics summarization on module " + this.statSummarizationModuleArray[i].statSummarizerConfiguration.summarizationModule);
             this.statSummarizationModuleArray[i].startStatSummarizationProcess();
+            logger.info("Statistics summarization end");
+            logger.debug("==================================");
+
         }
         // Code Here
     }

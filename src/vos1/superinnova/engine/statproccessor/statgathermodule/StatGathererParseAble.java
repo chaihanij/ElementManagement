@@ -12,8 +12,8 @@ import vos1.superinnova.engine.statproccessor.SuperInnovaStatEnginePropertiesLoo
  */
 public interface StatGathererParseAble {
 
-   public String[] getCreateRawTableSQL(SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup);
-   public String[] getInsertRawTableSQL(String input,StatGatherConfiguration statGatherConfiguration,SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup);
-   public String[] getTruncateRawTableSQL(SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup); 
-   public String[] getSelectRawTableSQL(SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup);
+   String[] getCreateRawTableSQL(SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup);
+   String[] getInsertRawTableSQL(String input, StatGatherConfiguration statGatherConfiguration, SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup);
+   String[] getTruncateRawTableSQL(SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup);
+   String[] getSelectRawTableSQL(SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup);
 }

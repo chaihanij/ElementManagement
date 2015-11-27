@@ -11,6 +11,7 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.server.handler.RequestLogHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import vos1.superinnova.engine.statproccessor.GlobalVariable;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
 
 /**
@@ -24,16 +25,16 @@ public class SuperInnovaStatInquiryServer extends Thread {
     SuperInnovaStatCore superInnovaStatCore;
 
     public SuperInnovaStatInquiryServer(SuperInnovaStatCore superInnovaStatCore, int portNumber) {
-
         this.superInnovaStatCore = superInnovaStatCore;
         this.portNumber = portNumber;
-        logger.info("Listener port : " + this.portNumber);
     }
 
     public void run() {
         try {
             startServer();
+            logger.info("Start server success port : " + this.portNumber);
         } catch (Exception e) {
+            logger.debug("Start server fail port : + " + this.portNumber);
             logger.error(e);
         }
     }
@@ -48,11 +49,11 @@ public class SuperInnovaStatInquiryServer extends Thread {
         context.setContextPath("/");
         handlers.addHandler(context);
 
-//        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + System.getProperty("file.separator") + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
+        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
         //        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
 
-        String pwdDEV = "/Users/Wachirawat/Desktop/PresentationEM/Build/SuperInnovaStatEngine/log/";
-        String _accessLogPath = pwdDEV + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
+//        String pwdDEV = "/Users/Wachirawat/Desktop/PresentationEM/Build/SuperInnovaStatEngine/log/";
+//        String _accessLogPath = pwdDEV + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
 
         logger.info("access log path " + _accessLogPath);
 

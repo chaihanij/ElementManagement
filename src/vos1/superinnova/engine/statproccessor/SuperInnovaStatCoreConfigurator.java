@@ -4,16 +4,16 @@
  */
 package vos1.superinnova.engine.statproccessor;
 
+import org.apache.log4j.Logger;
+import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
+import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.util.Enumeration;
 import java.util.Properties;
-
-import org.apache.log4j.Logger;
-import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
-import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
 
 /**
  * @author HugeScreen
@@ -114,7 +114,6 @@ public class SuperInnovaStatCoreConfigurator {
                                     usableRow++;
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
                             logger.error("Engine[" + prop.getProperty("ENGINE_NAME") + "]  Gatherer Target error");
                         } finally {
                             try {

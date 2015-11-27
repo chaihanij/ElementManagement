@@ -306,10 +306,10 @@ public class SupernovaStatAddSubtractModule extends StatSummarizationModule{
                                         case StatSummarizationResultSet.TYPE_INT:
                                             // === Strat Round Up Process =============
                                             Integer obj_before=(Integer)obj;
-                                            obj = (Integer)(obj_before / divideBy[i]);
+                                            obj = obj_before / divideBy[i];
                                             try{
                                                 float tryFloatValue=0;
-                                                tryFloatValue = (Integer)obj_before / (float)divideBy[i];
+                                                tryFloatValue = obj_before / (float)divideBy[i];
                                                 Double tmpDoubleValue=Math.ceil(tryFloatValue);
                                                 //System.out.println("INTEGER : tryFloatValue : "+tryFloatValue+", tmpDoubleValue : "+tmpDoubleValue);
                                                 obj=tmpDoubleValue.intValue();
@@ -324,11 +324,11 @@ public class SupernovaStatAddSubtractModule extends StatSummarizationModule{
                                             
                                             // === Strat Round Up Process =============
                                             Long long_obj_before=(Long)obj;
-                                            obj = (Long)((Long)obj / divideBy[i]);
+                                            obj = (Long)obj / divideBy[i];
                                             try{
                                                 double tryFloatValue=0;
                                                 //System.out.println(long_obj_before+" Divided by "+divideBy[i]);
-                                                tryFloatValue = ((Long)long_obj_before) / (float)divideBy[i];
+                                                tryFloatValue = long_obj_before / (float)divideBy[i];
                                                 //System.out.println("beforeMath.ceil : "+tryFloatValue);
                                                 Double tmpDoubleValue=Math.ceil(tryFloatValue);
                                                 //System.out.println("AfterMath.ceil : "+tmpDoubleValue);
@@ -343,10 +343,10 @@ public class SupernovaStatAddSubtractModule extends StatSummarizationModule{
                                             // === End Round Up Process =============                                            
                                             break;
                                         case StatSummarizationResultSet.TYPE_FLOAT:
-                                            obj = (Float)((Float)obj / divideBy[i]);
+                                            obj = (Float)obj / divideBy[i];
                                             break;
                                         case StatSummarizationResultSet.TYPE_DOUBLE:
-                                            obj = (Double)((Double)obj / divideBy[i]);
+                                            obj = (Double)obj / divideBy[i];
                                             break;                                      
                                     }
                                 }

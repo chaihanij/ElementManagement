@@ -133,7 +133,6 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
         //tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);
 
         try {
-
             for (; resultSet.next(); ) {
                 // Check Date
                 Timestamp dateTimeStamp = resultSet.getTimestamp(1 + SupernovaSuccessRateSummarizationModule.COL_DATE);
@@ -150,7 +149,6 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                 // Check Regex
                 String statName = (String) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_STATNAME);
 //              logger.debug("StatName : " + statName);
-
                 boolean foundMatchesRegex = false;
                 for (int i = 0; i < this.regexParam.length; i++) {
 
@@ -158,6 +156,8 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                         //System.out.println(i+", "+j+", StatName : "+statName+", Regex : "+this.regexParam[i][j]);
                         if (statName.matches(this.regexParam[i][j]) == true) {
                             //System.out.println(statName+", "+REGEX_PARAM_NAME[i]);
+//                            logger.debug(this.regexParam[i][j] + "==" + statName);
+
                             int site = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SITE);
                             int block = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_BLOCK);
                             int subBlock = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUBBLOCK);
@@ -173,7 +173,7 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                             int operation = StatSummarizationSmartResultSet.OPERATION_ADD;
                             //resultSet Start with 1, So we need to add 1 to Column Position
                             Object obj = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUMCOUNTER);
-                            logger.debug("putObject : " + site + "," + block + "," + subBlock + "," + this.REGEX_PARAM_NAME[columnNumber] + ",ADD," + obj);
+//                            logger.debug("putObject : " + site + "," + block + "," + subBlock + "," + this.REGEX_PARAM_NAME[columnNumber] + ",ADD," + obj);
                             if (obj != null) {
                                 tmpStatSummarizationSmartResultSet.putObject(site, block, subBlock, columnNumber, operation, obj);
                             } else {
@@ -201,9 +201,8 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
     public static final int OUTPUT_COL_PERCENTERROR=4;    
     public static final int OUTPUT_COL_NODECOUNT=5; 
              */
-            logger.debug("Row counter size : " + tmpStatSummarizationSmartResultSet.getRowCounter());
+//            logger.debug("Row counter size : " + tmpStatSummarizationSmartResultSet.getRowCounter());
             //tmpStatSummarizationSmartResultSet.dumpDataSet();
-
             for (int i = 0; i < tmpStatSummarizationSmartResultSet.getRowCounter(); i++) {
 
                 Long attempt = (Long) tmpStatSummarizationSmartResultSet.getObject(i, OUTPUT_COL_ATTEMPT);
@@ -216,7 +215,7 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
 //                logger.debug("[DEBUG] i : +" + i + ", Success : " + OUTPUT_COL_SUCCESS);
 //                logger.debug("[DEBUG] i : +" + i + ", Error : " + OUTPUT_COL_ERROR);
 
-                logger.debug("Attempt : " + attempt + ", success : " + success + ", error : " + error);
+
                 //tmpStatSummarizationSmartResultSet.dumpToString();
                 if (attempt != null && attempt >= 0) {
                     successRate = (float) success / (float) attempt * 100f;
@@ -226,9 +225,10 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                         successRate = 100f;
                     }
                     errorRate = 100f - successRate;
+                } else {
+                    successRate = 100f;
                 }
-                logger.debug("Calculate success value =  " + successRate + ", error value = " + errorRate);
-
+                logger.debug("Attempt : " + attempt + ", success : " + success + ", error : " + error + "%Attempt : " + successRate + "%Attempt : " + errorRate );
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_PERCENTSUCCESS, successRate);
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_PERCENTERROR, errorRate);
 
@@ -238,35 +238,14 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                 for (int j = 0; j < siteBlockSubBlockArray.length; j++) {
                     if (siteBlockSubBlockArray[j] != null) {
                         hostCounter = tmpStatSummarizationSmartResultSet.getHostListProp(j, siteBlockSubBlockArray[j]).size();
-
-                        /*
-                        String[] cn = new String[]{"site","block","subblock"};
-                        System.out.println("i : "+i+", j : "+j+", ["+cn[j]+"], hostcounter : "+hostCounter);
-                        Enumeration<Object> e = tmpStatSummarizationSmartResultSet.getHostListProp(j, siteBlockSubBlockArray[j]).elements();
-                        while(e.hasMoreElements()){
-                            System.out.println(""+e.nextElement());
-                        }
-                        */
-
-                                /*
-                        if(j==StatSummarizationSmartResultSet.MAP_SITE){
-                            hostCounter=tmpStatSummarizationSmartResultSet.getHostListProp(j, siteBlockSubBlockArray[j]).size();
-                        }
-                        else if(j==StatSummarizationSmartResultSet.MAP_BLOCK){
-                            hostCounter=tmpStatSummarizationSmartResultSet.getHostListProp(j, siteBlockSubBlockArray[j]).size();
-                        }
-                        else if(j==StatSummarizationSmartResultSet.MAP_SUBBLOCK){
-                            hostCounter=tmpStatSummarizationSmartResultSet.getHostListProp(j, siteBlockSubBlockArray[j]).size();
-                        }
-                        */
                     }
                 }
-                //System.out.println("putObject: row="+i+", columne="+OUTPUT_COL_NODECOUNT+", hostCounter="+hostCounter);
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_NODECOUNT, hostCounter);
 
-            }// End For #2
+            }
             this.statSummarizationSmartResultSet = tmpStatSummarizationSmartResultSet;
         } catch (Exception e) {
+            logger.error("statSummarizationSmartResultSet = null");
             this.statSummarizationSmartResultSet = null;
             logger.error(e);
         }
