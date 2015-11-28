@@ -10,6 +10,7 @@ import vos1.superinnova.engine.statsummarizer.*;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -73,6 +74,7 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
         this.regexParam[REGEX_PARAM_SUCCESS] = statSummarizerConfiguration.getAdditionalProperties().getProperty("param_success").split("\\|");
         this.regexParam[REGEX_PARAM_ERROR] = statSummarizerConfiguration.getAdditionalProperties().getProperty("param_error").split("\\|");
         this.paramPrefix = statSummarizerConfiguration.getAdditionalProperties().getProperty("param_prefix");
+
         if (this.paramPrefix != null) {
             for (int i = 0; i < columnName.length; i++) {
                 columnName[i] = this.paramPrefix + "." + columnName[i];
@@ -131,7 +133,9 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                 this.columnName,
                 this.unitType);
         //tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);
-
+        logger.debug("REGEX_PARAM_ATTEMPT = " + this.regexParam[0].length + " " + Arrays.toString(this.regexParam[0]));
+        logger.debug("REGEX_PARAM_SUCCESS = " + this.regexParam[1].length + " " + Arrays.toString(this.regexParam[1]));
+        logger.debug("REGEX_PARAM_ERROR = " + this.regexParam[2].length + " " + Arrays.toString(this.regexParam[2]));
         try {
             for (; resultSet.next(); ) {
                 // Check Date
@@ -153,35 +157,35 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                 for (int i = 0; i < this.regexParam.length; i++) {
 
                     for (int j = 0; j < this.regexParam[i].length; j++) {
-                        //System.out.println(i+", "+j+", StatName : "+statName+", Regex : "+this.regexParam[i][j]);
-                        if (statName.matches(this.regexParam[i][j]) == true) {
-                            //System.out.println(statName+", "+REGEX_PARAM_NAME[i]);
-//                            logger.debug(this.regexParam[i][j] + "==" + statName);
-
-                            int site = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SITE);
-                            int block = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_BLOCK);
-                            int subBlock = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUBBLOCK);
-                            // In This Situation columnNumber is I
-                            int columnNumber = -1;
-                            if (i == REGEX_PARAM_ATTEMPT) {
-                                columnNumber = SupernovaSuccessRateSummarizationModule.OUTPUT_COL_ATTEMPT;
-                            } else if (i == REGEX_PARAM_SUCCESS) {
-                                columnNumber = SupernovaSuccessRateSummarizationModule.OUTPUT_COL_SUCCESS;
-                            } else if (i == REGEX_PARAM_ERROR) {
-                                columnNumber = SupernovaSuccessRateSummarizationModule.OUTPUT_COL_ERROR;
-                            }
-                            int operation = StatSummarizationSmartResultSet.OPERATION_ADD;
-                            //resultSet Start with 1, So we need to add 1 to Column Position
-                            Object obj = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUMCOUNTER);
-//                            logger.debug("putObject : " + site + "," + block + "," + subBlock + "," + this.REGEX_PARAM_NAME[columnNumber] + ",ADD," + obj);
-                            if (obj != null) {
-                                tmpStatSummarizationSmartResultSet.putObject(site, block, subBlock, columnNumber, operation, obj);
-                            } else {
-                                logger.warn("Skip Null Object : " + site + "," + block + "," + subBlock + "," + columnNumber + "," + operation + "," + obj);
-                            }
-                            if (!this.redundancy) {
-                                foundMatchesRegex = true;
-                                break;
+                        if (this.regexParam[i][j] != null && !this.regexParam[i][j].isEmpty()) {
+                            if (statName.matches(this.regexParam[i][j]) == true) {
+                                logger.debug(this.regexParam[i][j] + "==" + statName);
+                                //System.out.println(statName+", "+REGEX_PARAM_NAME[i]);
+                                int site = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SITE);
+                                int block = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_BLOCK);
+                                int subBlock = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUBBLOCK);
+                                // In This Situation columnNumber is I
+                                int columnNumber = -1;
+                                if (i == REGEX_PARAM_ATTEMPT) {
+                                    columnNumber = SupernovaSuccessRateSummarizationModule.OUTPUT_COL_ATTEMPT;
+                                } else if (i == REGEX_PARAM_SUCCESS) {
+                                    columnNumber = SupernovaSuccessRateSummarizationModule.OUTPUT_COL_SUCCESS;
+                                } else if (i == REGEX_PARAM_ERROR) {
+                                    columnNumber = SupernovaSuccessRateSummarizationModule.OUTPUT_COL_ERROR;
+                                }
+                                int operation = StatSummarizationSmartResultSet.OPERATION_ADD;
+                                //resultSet Start with 1, So we need to add 1 to Column Position
+                                Object obj = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUMCOUNTER);
+                                logger.debug("putObject : " + site + "," + block + "," + subBlock + "," + this.REGEX_PARAM_NAME[columnNumber] + ",ADD," + obj);
+                                if (obj != null) {
+                                    tmpStatSummarizationSmartResultSet.putObject(site, block, subBlock, columnNumber, operation, obj);
+                                } else {
+                                    logger.warn("Skip Null Object : " + site + "," + block + "," + subBlock + "," + columnNumber + "," + operation + "," + obj);
+                                }
+                                if (!this.redundancy) {
+                                    foundMatchesRegex = true;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -191,18 +195,7 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                         }
                     }
                 }
-            }// End For #1
-            
-            /*
-                 public static final int OUTPUT_COL_ATTEMPT=0;
-    public static final int OUTPUT_COL_SUCCESS=1;
-    public static final int OUTPUT_COL_ERROR=2;
-    public static final int OUTPUT_COL_PERCENTSUCCESS=3;
-    public static final int OUTPUT_COL_PERCENTERROR=4;    
-    public static final int OUTPUT_COL_NODECOUNT=5; 
-             */
-//            logger.debug("Row counter size : " + tmpStatSummarizationSmartResultSet.getRowCounter());
-            //tmpStatSummarizationSmartResultSet.dumpDataSet();
+            }
             for (int i = 0; i < tmpStatSummarizationSmartResultSet.getRowCounter(); i++) {
 
                 Long attempt = (Long) tmpStatSummarizationSmartResultSet.getObject(i, OUTPUT_COL_ATTEMPT);
@@ -211,13 +204,8 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                 Float successRate = -1f;
                 Float errorRate = -1f;
 
-//                logger.debug("[DEBUG] i : +" + i + ", Attempt : " + OUTPUT_COL_ATTEMPT);
-//                logger.debug("[DEBUG] i : +" + i + ", Success : " + OUTPUT_COL_SUCCESS);
-//                logger.debug("[DEBUG] i : +" + i + ", Error : " + OUTPUT_COL_ERROR);
-
-
-                //tmpStatSummarizationSmartResultSet.dumpToString();
-                if (attempt != null && attempt >= 0) {
+//                tmpStatSummarizationSmartResultSet.dumpToString();
+                if (attempt != null && attempt > 0) {
                     successRate = (float) success / (float) attempt * 100f;
 
                     //errorRate=(float)((float)error/attempt*100);
@@ -227,8 +215,16 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                     errorRate = 100f - successRate;
                 } else {
                     successRate = 100f;
+                    errorRate = 100f - successRate;
                 }
-                logger.debug("Attempt : " + attempt + ", success : " + success + ", error : " + error + "%Attempt : " + successRate + "%Attempt : " + errorRate );
+                StringBuilder _logCal = new StringBuilder();
+
+                _logCal.append("Attempt : ").append(attempt);
+                _logCal.append(", Success rate : ").append(success);
+                _logCal.append(", Error rate : ").append(error);
+                _logCal.append(", %Attempt rate : ").append(successRate);
+                _logCal.append(", %Error rate : ").append(errorRate);
+                logger.debug(_logCal);
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_PERCENTSUCCESS, successRate);
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_PERCENTERROR, errorRate);
 
@@ -241,7 +237,6 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
                     }
                 }
                 tmpStatSummarizationSmartResultSet.putObject(i, OUTPUT_COL_NODECOUNT, hostCounter);
-
             }
             this.statSummarizationSmartResultSet = tmpStatSummarizationSmartResultSet;
         } catch (Exception e) {

@@ -10,6 +10,7 @@ import vos1.superinnova.engine.statsummarizer.*;
 
 import java.sql.ResultSet;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -218,6 +219,10 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
         try {
             logger.debug("Category size = " + this.categorySize);
 
+            for (int i = 0; i < this.categorySize; i++) {
+                logger.debug("Column : " + this.columnName[i] + " " + this.inputSRegexParam[i].length + " " + Arrays.toString(this.inputSRegexParam[i]));
+            }
+
             for (; resultSet.next(); ) {
                 // Check Date
                 Timestamp dateTimeStamp = resultSet.getTimestamp(1 + SupernovaSuccessRateSummarizationModule.COL_DATE);
@@ -240,161 +245,167 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                     // Loop Detected From StatName
                     for (int j = 0; j < this.inputSRegexParam[i].length; j++) {
 //                        logger.debug("Category["+i +"]  " +  "Detect stat size = " + this.inputSRegexParam[i].length);
+                        if (this.inputSRegexParam[i][j] != null && !this.inputSRegexParam[i][j].isEmpty())
+                            if (statName.matches(this.inputSRegexParam[i][j]) == true) {
+                                logger.debug("Column : " + this.columnName[i] + " , [" + this.inputSRegexParam[i][j] + "]" + "is  matched " + " , [" + statName + "]");
+                                //System.out.println("matcher : i:"+i+", j:"+j);
+                                //ystem.out.println(" - Matched");
+                                //System.out.println(statName+", "+REGEX_PARAM_NAME[i]);
+                                int site = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SITE);
+                                int block = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_BLOCK);
+                                int subBlock = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUBBLOCK);
+                                //System.out.println("site,Block,SubBlock "+site+", "+block+", "+subBlock);
+                                // In This Situation columnNumber is I
 
-                        if (statName.matches(this.inputSRegexParam[i][j]) == true) {
-//                            logger.debug(this.inputSRegexParam[i][j] + "==" + statName);
 
-                            //System.out.println("matcher : i:"+i+", j:"+j);
-                            //ystem.out.println(" - Matched");
-                            //System.out.println(statName+", "+REGEX_PARAM_NAME[i]);
-                            int site = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SITE);
-                            int block = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_BLOCK);
-                            int subBlock = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUBBLOCK);
-                            //System.out.println("site,Block,SubBlock "+site+", "+block+", "+subBlock);
-                            // In This Situation columnNumber is I
+                                //int operation=StatSummarizationSmartResultSet.OPERATION_ADD;
+                                int operation = this.aggregrateType;
 
-
-                            //int operation=StatSummarizationSmartResultSet.OPERATION_ADD;
-                            int operation = this.aggregrateType;
-
-                            //resultSet Start with 1, So we need to add 1 to Column Position
-                            Object obj = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUMCOUNTER);
+                                //resultSet Start with 1, So we need to add 1 to Column Position
+                                Object obj = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUMCOUNTER);
 
 //                          logger.debug(String.format("putx : %d, %d, %d, %d, %d, %s",site,block,subBlock,i,operation,obj));
-                            // Calulate TPS
-                            if (divideBy[i] > 1) {
-                                switch (metaData[i]) {
-                                    case StatSummarizationResultSet.TYPE_INT:
-                                        // === Strat Round Up Process =============
-                                        Integer obj_before = (Integer) obj;
-                                        obj = obj_before / divideBy[i];
-                                        try {
-                                            float tryFloatValue = 0;
-                                            tryFloatValue = obj_before / (float) divideBy[i];
-                                            Double tmpDoubleValue = Math.ceil(tryFloatValue);
-                                            //System.out.println("INTEGER : tryFloatValue : "+tryFloatValue+", tmpDoubleValue : "+tmpDoubleValue);
-                                            obj = tmpDoubleValue.intValue();
-
-                                        } catch (Exception e) {
-                                            logger.error(e);
-                                            //if This is Float
-                                            //e.printStackTrace();
-                                        }
-                                        // === End Round Up Process =============
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_LONG:
-
-                                        // === Strat Round Up Process =============
-                                        Long long_obj_before = (Long) obj;
-                                        obj = (Long) obj / divideBy[i];
-                                        try {
-                                            double tryFloatValue = 0;
-                                            //System.out.println(long_obj_before+" Divided by "+divideBy[i]);
-                                            tryFloatValue = long_obj_before / (float) divideBy[i];
-                                            //System.out.println("beforeMath.ceil : "+tryFloatValue);
-                                            Double tmpDoubleValue = Math.ceil(tryFloatValue);
-                                            //System.out.println("AfterMath.ceil : "+tmpDoubleValue);
-                                            //System.out.println("LONG : tryFloatValue : "+tryFloatValue+", tmpDoubleValue : "+tmpDoubleValue);
-                                            obj = tmpDoubleValue.longValue();
-                                            //System.out.println("LONG : obj : "+obj+", : "+(Long)obj);
-                                        } catch (Exception e) {
-                                            logger.error(e);
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_FLOAT:
-                                        obj = (Float.parseFloat(obj.toString())) / divideBy[i];
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_DOUBLE:
-                                        obj = (Double.parseDouble(obj.toString())) / divideBy[i];
-                                        break;
-                                }
-                            }
-
-                            Object min = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_MINCOUNTER);
-                            Object max = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_MAXCOUNTER);
-
-//                            logger.debug("AverageTime[" + i + "]" + AverageTime[i]);
-                            try {
-                                if (AverageTime[i] > 1) {
+                                // Calulate TPS
+                                if (divideBy[i] > 1) {
                                     switch (metaData[i]) {
                                         case StatSummarizationResultSet.TYPE_INT:
+                                            // === Strat Round Up Process =============
+                                            Integer obj_before = (Integer) obj;
+                                            obj = obj_before / divideBy[i];
                                             try {
-                                                Integer intBeforeMin = Integer.parseInt(min.toString());
-                                                min = intBeforeMin / AverageTime[i];
-
-                                                Integer intBeforeMax = Integer.parseInt(max.toString());
-                                                max = intBeforeMax / AverageTime[i];
-
-                                                // min
-                                                float tryFloatValueMin = 0;
-                                                tryFloatValueMin = intBeforeMin / (float) AverageTime[i];
-                                                Double tmpDoubleValueMin = Math.ceil(tryFloatValueMin);
-                                                min = tmpDoubleValueMin.intValue();
-
-                                                // max
-                                                float tryFloatValueMax = 0;
-                                                tryFloatValueMax = intBeforeMax / (float) AverageTime[i];
-                                                Double tmpDoubleValueMax = Math.ceil(tryFloatValueMax);
-                                                max = tmpDoubleValueMax.intValue();
+                                                float tryFloatValue = 0;
+                                                tryFloatValue = obj_before / (float) divideBy[i];
+                                                Double tmpDoubleValue = Math.ceil(tryFloatValue);
+                                                //System.out.println("INTEGER : tryFloatValue : "+tryFloatValue+", tmpDoubleValue : "+tmpDoubleValue);
+                                                obj = tmpDoubleValue.intValue();
 
                                             } catch (Exception e) {
-                                                logger.error("TYPE_INT" + e);
+                                                logger.error(e);
+                                                //if This is Float
+                                                //e.printStackTrace();
                                             }
+                                            // === End Round Up Process =============
                                             break;
                                         case StatSummarizationResultSet.TYPE_LONG:
+
+                                            // === Strat Round Up Process =============
+                                            Long long_obj_before = (Long) obj;
+                                            obj = (Long) obj / divideBy[i];
                                             try {
-                                                Long longBeforeMin = Long.parseLong(min.toString());
-                                                min = longBeforeMin / AverageTime[i];
-
-                                                Long longBeforeMax = Long.parseLong(max.toString());
-                                                max = longBeforeMax / AverageTime[i];
-
-                                                double tryFloatValueMin = 0;
-                                                tryFloatValueMin = longBeforeMin / (float) AverageTime[i];
-                                                Double tmpDoubleValueMin = Math.ceil(tryFloatValueMin);
-                                                min = tmpDoubleValueMin.longValue();
-
-                                                double tryFloatValueMax = 0;
-                                                tryFloatValueMax = longBeforeMax / (float) AverageTime[i];
-                                                Double tmpDoubleValueMax = Math.ceil(tryFloatValueMax);
-                                                max = tmpDoubleValueMax.longValue();
-
+                                                double tryFloatValue = 0;
+                                                //System.out.println(long_obj_before+" Divided by "+divideBy[i]);
+                                                tryFloatValue = long_obj_before / (float) divideBy[i];
+                                                //System.out.println("beforeMath.ceil : "+tryFloatValue);
+                                                Double tmpDoubleValue = Math.ceil(tryFloatValue);
+                                                //System.out.println("AfterMath.ceil : "+tmpDoubleValue);
+                                                //System.out.println("LONG : tryFloatValue : "+tryFloatValue+", tmpDoubleValue : "+tmpDoubleValue);
+                                                obj = tmpDoubleValue.longValue();
+                                                //System.out.println("LONG : obj : "+obj+", : "+(Long)obj);
                                             } catch (Exception e) {
-                                                logger.error("TYPE_LONG :" + e);
+                                                logger.error(e);
                                             }
                                             break;
                                         case StatSummarizationResultSet.TYPE_FLOAT:
-                                            try {
-                                                min = (Float.parseFloat(min.toString())) / AverageTime[i];
-                                                max = (Float.parseFloat(max.toString())) / AverageTime[i];
-                                            } catch (Exception e) {
-                                                logger.error("TYPE_FLOAT :" + e);
-                                            }
+                                            obj = (Float.parseFloat(obj.toString())) / divideBy[i];
                                             break;
                                         case StatSummarizationResultSet.TYPE_DOUBLE:
-                                            try {
-                                                min = (Double.parseDouble(min.toString())) / AverageTime[i];
-                                                max = (Double.parseDouble(max.toString())) / AverageTime[i];
-                                            } catch (Exception e) {
-                                                logger.error("TYPE_DOUBLE :" + e);
-                                            }
+                                            obj = (Double.parseDouble(obj.toString())) / divideBy[i];
                                             break;
                                     }
                                 }
-                            } catch (Exception e) {
-                                logger.error(e);
+
+                                Object min = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_MINCOUNTER);
+                                Object max = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_MAXCOUNTER);
+
+//                               logger.debug("AverageTime[" + i + "]" + AverageTime[i]);
+
+                                try {
+                                    if (min != null && max != null) {
+                                        if (AverageTime[i] > 1) {
+                                            switch (metaData[i]) {
+                                                case StatSummarizationResultSet.TYPE_INT:
+                                                    try {
+                                                        Integer intBeforeMin = Integer.parseInt(min.toString());
+                                                        min = intBeforeMin / AverageTime[i];
+
+                                                        Integer intBeforeMax = Integer.parseInt(max.toString());
+                                                        max = intBeforeMax / AverageTime[i];
+
+                                                        // min
+                                                        float tryFloatValueMin = 0;
+                                                        tryFloatValueMin = intBeforeMin / (float) AverageTime[i];
+                                                        Double tmpDoubleValueMin = Math.ceil(tryFloatValueMin);
+                                                        min = tmpDoubleValueMin.intValue();
+
+                                                        // max
+                                                        float tryFloatValueMax = 0;
+                                                        tryFloatValueMax = intBeforeMax / (float) AverageTime[i];
+                                                        Double tmpDoubleValueMax = Math.ceil(tryFloatValueMax);
+                                                        max = tmpDoubleValueMax.intValue();
+
+                                                    } catch (Exception e) {
+                                                        logger.error("TYPE_INT" + e);
+                                                    }
+                                                    break;
+                                                case StatSummarizationResultSet.TYPE_LONG:
+                                                    try {
+                                                        Long longBeforeMin = Long.parseLong(min.toString());
+                                                        min = longBeforeMin / AverageTime[i];
+
+                                                        Long longBeforeMax = Long.parseLong(max.toString());
+                                                        max = longBeforeMax / AverageTime[i];
+
+                                                        double tryFloatValueMin = 0;
+                                                        tryFloatValueMin = longBeforeMin / (float) AverageTime[i];
+                                                        Double tmpDoubleValueMin = Math.ceil(tryFloatValueMin);
+                                                        min = tmpDoubleValueMin.longValue();
+
+                                                        double tryFloatValueMax = 0;
+                                                        tryFloatValueMax = longBeforeMax / (float) AverageTime[i];
+                                                        Double tmpDoubleValueMax = Math.ceil(tryFloatValueMax);
+                                                        max = tmpDoubleValueMax.longValue();
+
+                                                    } catch (Exception e) {
+                                                        logger.error("TYPE_LONG :" + e);
+                                                    }
+                                                    break;
+                                                case StatSummarizationResultSet.TYPE_FLOAT:
+                                                    try {
+                                                        min = (Float.parseFloat(min.toString())) / AverageTime[i];
+                                                        max = (Float.parseFloat(max.toString())) / AverageTime[i];
+                                                    } catch (Exception e) {
+                                                        logger.error("TYPE_FLOAT :" + e);
+                                                    }
+                                                    break;
+                                                case StatSummarizationResultSet.TYPE_DOUBLE:
+                                                    try {
+                                                        min = (Double.parseDouble(min.toString())) / AverageTime[i];
+                                                        max = (Double.parseDouble(max.toString())) / AverageTime[i];
+                                                    } catch (Exception e) {
+                                                        logger.error("TYPE_DOUBLE :" + e);
+                                                    }
+                                                    break;
+                                            }
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    logger.error("Error calculate min and max");
+                                    logger.error(e);
+                                }
+
+                                logger.debug(String.format("PutObject : %d, %d, %d, %d, %d, %s", site, block, subBlock, i, operation, obj));
+                                logger.debug(String.format("PutMinObject : %d, %d, %d, %d, %d, %s", site, block, subBlock, i, 5, min));
+                                logger.debug(String.format("PutMaxObject : %d, %d, %d, %d, %d, %s", site, block, subBlock, i, 4, max));
+
+                                tmpStatSummarizationSmartResultSet.putObject(site, block, subBlock, i, operation, obj);
+                                tmpStatSummarizationSmartResultSet.putMinObject(site, block, subBlock, i, 5, min);
+                                tmpStatSummarizationSmartResultSet.putMaxObject(site, block, subBlock, i, 4, max);
+
+                                if (!this.redundancy) {
+                                    foundMatchesRegex = true;
+                                    break;
+                                }
                             }
-
-                            tmpStatSummarizationSmartResultSet.putObject(site, block, subBlock, i, operation, obj);
-                            tmpStatSummarizationSmartResultSet.putMinObject(site, block, subBlock, i, 5, min);
-                            tmpStatSummarizationSmartResultSet.putMaxObject(site, block, subBlock, i, 4, max);
-
-
-                            if (!this.redundancy) {
-                                foundMatchesRegex = true;
-                                break;
-                            }
-                        }
                         // Check if foundMatchesRegex
                         if (!this.redundancy) {
                             if (foundMatchesRegex == true) {

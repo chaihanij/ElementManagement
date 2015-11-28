@@ -40,14 +40,13 @@ public class LogConfiguration {
 
         // Redirect log messages to a log file, support file rolling.
         proLog4j.setProperty("log4j.appender.file", "org.apache.log4j.DailyRollingFileAppender");
-//      proLog4j.setProperty("log4j.appender.file.File", "/Users/Wachirawat/Desktop/PresentationEM/Build/SuperInnovaStatEngine/log/" + logName + ".log");
         proLog4j.setProperty("log4j.appender.file.File", GlobalVariable.BASE_LOG_PATH + logName + ".log");
         proLog4j.setProperty("log4j.appender.file.DatePattern", "'.'yyyy-MM-dd");
         proLog4j.setProperty("log4j.appender.file.layout", "org.apache.log4j.PatternLayout");
         proLog4j.setProperty("log4j.appender.file.layout.ConversionPattern", "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n");
 
         // Redirect log messages to console
-//        proLog4j.setProperty("log4j.rootLogger", "DEBUG, stdout");
+//        proLog4j.setProperty("log4j.rootLogger", "DEBUG, stdout, file");
 //        proLog4j.setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender");
 //        proLog4j.setProperty("log4j.appender.stdout.Target", "System.out");
 //        proLog4j.setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout");

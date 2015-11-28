@@ -28,6 +28,7 @@ public class StatSummarizationResultSet {
     protected Object[][] lastestDataSet = null;
     protected Object[][] minDataSet = null;
     protected Object[][] maxDataSet = null;
+
     protected String[] columnName = null;
     protected String[] unitType = null;
 
@@ -48,7 +49,10 @@ public class StatSummarizationResultSet {
         }
 
     }
-
+    public String getColumnName(Integer i) {
+//        logger.debug("getColumnName = " + this.columnName[i]);
+        return this.columnName[i];
+    }
     public void putObject(int i, int j, Object rowObj) {
         this.lastestDataSet[i][j] = rowObj;
     }
