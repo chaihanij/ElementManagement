@@ -36,7 +36,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
     Properties[] blockLevelMaxHostListArray = null;
     Properties[] subBlockLevelMaxHostListArray = null;
 
-
     Properties reverseRowMapping = null;
     Properties reverseMinRowMapping = null;
     Properties reverseMaxRowMapping = null;
@@ -60,7 +59,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
     int rowCounter = 0;
     int rowMinCounter = 0;
     int rowMaxCounter = 0;
-
 
     public static final int OPERATION_REPLACE = 0;
     public static final int OPERATION_ADD = 1;
@@ -88,7 +86,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
     public void setMaxDate(Timestamp maxDate) {
         this.maxDate = maxDate;
     }
-
 
     public int getRowCounter() {
         return rowCounter;
@@ -178,7 +175,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         reverseRowMapping = new Properties();
         reverseMinRowMapping = new Properties();
         reverseMaxRowMapping = new Properties();
-
 
         clearCounter();
         //this.row=siteProp.stringPropertyNames().size()+blockProp.stringPropertyNames().size()+subBlockProp.stringPropertyNames().size()+1;
@@ -343,7 +339,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             subBlockLevelHostListArray[subBlock].put(new Integer(subBlock), true);
         }
 
-
         // Put Object // Site Put
         operationPut(this.siteLevelLocationArray[site], columnNumber, operation, obj);
         // Put Object // Block Put
@@ -386,7 +381,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         if (subBlockLevelHostListArray[subBlock].get(subBlock) == null) {
             subBlockLevelHostListArray[subBlock].put(new Integer(subBlock), true);
         }
-
 
         // Put Object // Site Put
         operationPut(this.siteLevelLocationArray[site], columnNumber, operation, obj);
@@ -490,24 +484,24 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         } else if (operation == OPERATION_MAXTPS) {
             try {
 
-                Long maxDefault= Long.MIN_VALUE;
+                Long maxDefault = Long.MIN_VALUE;
                 Long max = maxDefault;
-                if ( this.getMaxObject(i, j) != null ) {
-                    max  = Long.parseLong(this.getMaxObject(i, j).toString());
+                if (this.getMaxObject(i, j) != null) {
+                    max = Long.parseLong(this.getMaxObject(i, j).toString());
                 }
                 Long value = Long.parseLong(obj.toString());
 
                 if (max != null) {
-                    if ( value > max) {
+                    if (value > max) {
                         max = value;
                     }
                 } else {
-                    if ( value > maxDefault) {
+                    if (value > maxDefault) {
                         max = value;
                     }
                 }
                 this.putMaxObject(i, j, max);
-            }  catch (Exception e)  {
+            } catch (Exception e) {
                 logger.error(e);
 //                this.putMaxObject(i, j, obj);
             }
@@ -515,23 +509,23 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         } else if (operation == OPERATION_MINTPS) {
             try {
                 Long minDefault = Long.MAX_VALUE;
-                Long min = minDefault ;
-                if ( this.getMinObject(i, j) != null ) {
-                    min  = Long.parseLong(this.getMinObject(i, j).toString());
+                Long min = minDefault;
+                if (this.getMinObject(i, j) != null) {
+                    min = Long.parseLong(this.getMinObject(i, j).toString());
                 }
                 Long value = Long.parseLong(obj.toString());
                 if (min != null) {
-                    if ( value < min) {
+                    if (value < min) {
                         min = value;
                     }
                 } else {
-                    if ( value < minDefault) {
+                    if (value < minDefault) {
                         min = value;
                     }
                 }
                 this.putMinObject(i, j, min);
 
-            }  catch (Exception e) {
+            } catch (Exception e) {
                 logger.error(e);
 //                this.putMinObject(i, j, obj);
             }
@@ -581,7 +575,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         operationPut(this.subBlockLevelMinLocationArray[subBlock], columnNumber, operation, obj);
 
     }
-
 
     public void putMaxObject(int site, int block, int subBlock, int columnNumber, int operation, Object obj) {
 
@@ -825,7 +818,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         return sb.toString();
     }
 
-
     @Override
     public void dumpDataSet() {
 
@@ -833,7 +825,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         logger.debug("Min " + this.dumpMinToString());
         logger.debug("MAX " + this.dumpMaxToString());
     }
-
 
     public String getStringPrefixIdentifier(Integer[] siteBlockSubBlockArray, int prefixIdentifier) {
         StringBuffer sb = new StringBuffer();
@@ -855,7 +846,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         }
 
     }
-
 
     public String getIdentifier(Integer[] siteBlockSubBlockArray) {
 
@@ -901,6 +891,8 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             String evaluatePrefix = prop.getProperty("evaluatePrefix");
             String evaluateAsIntegerText = prop.getProperty("evaluateAsInteger");
 
+            String showMaxMinTPSString = prop.getProperty("showMaxMinTPS");
+
             MinMaxAverageSumFinder minMaxAverageSumFinder = new MinMaxAverageSumFinder();
 
             boolean showEvaluateOnly = false;
@@ -910,11 +902,12 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             boolean showEvaluateAverage = false;
             boolean evaluateAsInteger = false;
 
-
             boolean hideUnit = false;
             boolean hideFloatTag = false;
             boolean showSitePrefix = false;
             boolean showBlockPrefix = false;
+
+            boolean showMaxMinTPS = false;
 
             if (hideUnitString != null && hideUnitString.compareToIgnoreCase("true") == 0) {
                 hideUnit = true;
@@ -955,16 +948,19 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                 evaluateAsInteger = true;
             }
 
+            if (showMaxMinTPSString != null && showMaxMinTPSString.compareToIgnoreCase("true") == 0) {
+                showMaxMinTPS = true;
+            }
             // Init Select Column Process
             String selectColumnString = prop.getProperty("selectColumn");
             String[] selectColumnStringArray = null;
             if (selectColumnString != null) {
                 selectColumnStringArray = selectColumnString.split("%7C");
                 /*
-                for(int z=0;z<selectColumnStringArray.length;z++){
-                    System.out.println("z["+z+"] : "+selectColumnStringArray[z]);
-                }
-                */
+                 for(int z=0;z<selectColumnStringArray.length;z++){
+                 System.out.println("z["+z+"] : "+selectColumnStringArray[z]);
+                 }
+                 */
                 if (selectColumnStringArray == null || selectColumnStringArray.length <= 1) {
                     selectColumnStringArray = selectColumnString.split("\\|");
                 }
@@ -978,10 +974,11 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                 }
             }
 
-            Boolean getHostCounter = getHostCounter = Boolean.parseBoolean(prop.getProperty("getNodeCounter"));
+            Boolean getHostCounter = Boolean.parseBoolean(prop.getProperty("getNodeCounter"));
             if (getHostCounter == null) {
                 getHostCounter = true;
             }
+
             int[] resultSet = null;
             int[] resultSetMin = null;
             int[] resultSetMax = null;
@@ -990,7 +987,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             int resultSetCounterMin = 0;
             int resultSetCounterMax = 0;
 
-            logger.debug("level : " + level);
             int[] locationMapper = null;
             int[] locationMinMapper = null;
             int[] locationMaxMapper = null;
@@ -1048,24 +1044,22 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                     //System.out.println("resultSet[i] : "+resultSet[i]);
                     siteBlockSubBlockArray = getSiteBlockSubBlockMappingFromRowNumber(resultSet[i]);
                     /*
-                    for(int xz=0;xz<siteBlockSubBlockArray.length;xz++){
-                        if(siteBlockSubBlockArray[xz]!=null){
-                            System.out.println("xz : "+xz+", data : "+siteBlockSubBlockArray[xz]);
-                        }
-                    }
-                    */
-                    
-                    
+                     for(int xz=0;xz<siteBlockSubBlockArray.length;xz++){
+                     if(siteBlockSubBlockArray[xz]!=null){
+                     System.out.println("xz : "+xz+", data : "+siteBlockSubBlockArray[xz]);
+                     }
+                     }
+                     */
+
                     /*WRONG
-                    String siteName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_SITE);
-                    String blockName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_BLOCK);
-                    String subBlockName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_SUBBLOCK);
-                    System.out.println("SBS , "+siteName+", "+blockName+", "+subBlockName);
-                    */
+                     String siteName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_SITE);
+                     String blockName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_BLOCK);
+                     String subBlockName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_SUBBLOCK);
+                     System.out.println("SBS , "+siteName+", "+blockName+", "+subBlockName);
+                     */
                     boolean printSitePrefix = false;
                     boolean printBlockPrefix = false;
                     boolean printSubBlockPrefix = false;
-
 
                     if (mapLevel == StatSummarizationSmartResultSet.MAP_SITE || showSitePrefix == true) {
                         printSitePrefix = true;
@@ -1112,17 +1106,16 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                         logger.error(e);
                     }
 
-
                     if (filterRegex != null && filterRegex.length() > 0 && channelName != null && channelName.length() > 0) {
                         String[] filterRegexArray = filterRegex.split("%7C");
                         if (filterRegexArray == null || filterRegexArray.length <= 1) {
                             filterRegexArray = filterRegex.split("\\|");
-                        }                
-                        /*
-                        for(int z=0;z<filterRegexArray.length;z++){
-                                                System.out.println("z1["+z+"] : "+filterRegexArray[z]);
                         }
-                        */
+                        /*
+                         for(int z=0;z<filterRegexArray.length;z++){
+                         System.out.println("z1["+z+"] : "+filterRegexArray[z]);
+                         }
+                         */
                         boolean isChannelNameMatched = false;
                         for (int k = 0; k < filterRegexArray.length; k++) {
                             //System.out.println("checkMatched-channelName : "+channelName+", regex : "+filterRegexArray[k]+", status : "+channelName.matches(filterRegexArray[k]));
@@ -1264,406 +1257,407 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                         prtgOutput.append("</result>");
                     }// End For J
                 }
-
-                if (this.getSiteBlockSubBlockMappingFromMaxRowNumber(0) != null
-                        && this.getSiteBlockSubBlockMappingFromMinRowNumber(0) != null) {
+                if (showMaxMinTPS) {
+                    if (this.getSiteBlockSubBlockMappingFromMaxRowNumber(0) != null
+                            && this.getSiteBlockSubBlockMappingFromMinRowNumber(0) != null) {
 //                    Max
-                    logger.debug("Set max and min");
-                    if (this.getSiteBlockSubBlockMappingFromMaxRowNumber(0) != null)
-                        for (int i = 0; i < resultSetMax.length; i++) {
+                        logger.debug("Set max and min");
+                        if (this.getSiteBlockSubBlockMappingFromMaxRowNumber(0) != null) {
+                            for (int i = 0; i < resultSetMax.length; i++) {
 
-                            if (identifierArray != null && i > resultSetCounterMax) {
-                                break;
-                            }
-
-                            if (resultSetMax[i] < 0) {
-                                logger.error("resultSetMax[" + i + "] : " + resultSetMax[i] + ", Less Than Zero");
-                                continue;
-                            }
-
-                            Integer[] siteBlockSubBlockArray = null;
-                            String channelName = null;
-                            siteBlockSubBlockArray = getSiteBlockSubBlockMappingFromMaxRowNumber(resultSetMax[i]);
-
-                            boolean printSitePrefix = false;
-                            boolean printBlockPrefix = false;
-                            boolean printSubBlockPrefix = false;
-
-
-                            if (mapLevel == StatSummarizationSmartResultSet.MAP_SITE || showSitePrefix) {
-                                printSitePrefix = true;
-                            }
-                            if (mapLevel == StatSummarizationSmartResultSet.MAP_BLOCK || showBlockPrefix) {
-                                printBlockPrefix = true;
-                            }
-                            if (mapLevel == StatSummarizationSmartResultSet.MAP_SUBBLOCK) {
-                                printSubBlockPrefix = true;
-                            }
-                            channelName = this.getIdentifier(siteBlockSubBlockArray);
-                            try {
-
-                                int nameCounter = 0;
-                                StringBuilder channelNameBuilder = new StringBuilder();
-                                String[] siteBlockSubBlockName = channelName.split(StatGathererParser.FIELD_SEPARATOR_REPLACE_REGEX);
-                                if (printSitePrefix) {
-                                    channelNameBuilder.append(siteBlockSubBlockName[0]);
-                                    nameCounter++;
+                                if (identifierArray != null && i > resultSetCounterMax) {
+                                    break;
                                 }
-                                if (printBlockPrefix) {
-                                    if (nameCounter > 0) {
-                                        channelNameBuilder.append("-");
-                                    }
-                                    channelNameBuilder.append(siteBlockSubBlockName[1]);
-                                    nameCounter++;
-                                }
-                                if (printSubBlockPrefix) {
-                                    if (nameCounter > 0) {
-                                        channelNameBuilder.append("-");
-                                    }
-                                    channelNameBuilder.append(siteBlockSubBlockName[2]);
-                                    nameCounter++;
-                                }
-                                channelName = channelNameBuilder.toString();
-                            } catch (Exception e) {
-                                channelName = "";
-                                logger.error(e);
-                            }
-                            logger.debug(channelName);
 
-                            if (filterRegex != null && filterRegex.length() > 0 && channelName != null && channelName.length() > 0) {
-                                String[] filterRegexArray = filterRegex.split("%7C");
-                                if (filterRegexArray == null || filterRegexArray.length <= 1) {
-                                    filterRegexArray = filterRegex.split("\\|");
-                                }
-                                boolean isChannelNameMatched = false;
-                                for (int k = 0; k < filterRegexArray.length; k++) {
-                                    isChannelNameMatched = channelName.matches(filterRegexArray[k]);
-                                    if (isChannelNameMatched) {
-                                        break;
-                                    }
-                                }
-                                if (!isChannelNameMatched) {
+                                if (resultSetMax[i] < 0) {
+                                    logger.error("resultSetMax[" + i + "] : " + resultSetMax[i] + ", Less Than Zero");
                                     continue;
                                 }
-                            }
-                            // Channel
-                            for (int j = 0; j < this.columnName.length; j++) {
 
-                                if (selectColumnStringArray != null) {
+                                Integer[] siteBlockSubBlockArray = null;
+                                String channelName = null;
+                                siteBlockSubBlockArray = getSiteBlockSubBlockMappingFromMaxRowNumber(resultSetMax[i]);
 
-                                    String decimeter = "-";
-                                    String[] extractColumnNameArray = this.columnName[j].split(decimeter);
-                                    String extractColumnName = extractColumnNameArray[extractColumnNameArray.length - 1];
+                                boolean printSitePrefix = false;
+                                boolean printBlockPrefix = false;
+                                boolean printSubBlockPrefix = false;
 
-                                    boolean foundSelectColumn = (selectColumnList.get(extractColumnName) == null);
-                                    if (foundSelectColumn) {
+                                if (mapLevel == StatSummarizationSmartResultSet.MAP_SITE || showSitePrefix) {
+                                    printSitePrefix = true;
+                                }
+                                if (mapLevel == StatSummarizationSmartResultSet.MAP_BLOCK || showBlockPrefix) {
+                                    printBlockPrefix = true;
+                                }
+                                if (mapLevel == StatSummarizationSmartResultSet.MAP_SUBBLOCK) {
+                                    printSubBlockPrefix = true;
+                                }
+                                channelName = this.getIdentifier(siteBlockSubBlockArray);
+                                try {
+
+                                    int nameCounter = 0;
+                                    StringBuilder channelNameBuilder = new StringBuilder();
+                                    String[] siteBlockSubBlockName = channelName.split(StatGathererParser.FIELD_SEPARATOR_REPLACE_REGEX);
+                                    if (printSitePrefix) {
+                                        channelNameBuilder.append(siteBlockSubBlockName[0]);
+                                        nameCounter++;
+                                    }
+                                    if (printBlockPrefix) {
+                                        if (nameCounter > 0) {
+                                            channelNameBuilder.append("-");
+                                        }
+                                        channelNameBuilder.append(siteBlockSubBlockName[1]);
+                                        nameCounter++;
+                                    }
+                                    if (printSubBlockPrefix) {
+                                        if (nameCounter > 0) {
+                                            channelNameBuilder.append("-");
+                                        }
+                                        channelNameBuilder.append(siteBlockSubBlockName[2]);
+                                        nameCounter++;
+                                    }
+                                    channelName = channelNameBuilder.toString();
+                                } catch (Exception e) {
+                                    channelName = "";
+                                    logger.error(e);
+                                }
+                                logger.debug(channelName);
+
+                                if (filterRegex != null && filterRegex.length() > 0 && channelName != null && channelName.length() > 0) {
+                                    String[] filterRegexArray = filterRegex.split("%7C");
+                                    if (filterRegexArray == null || filterRegexArray.length <= 1) {
+                                        filterRegexArray = filterRegex.split("\\|");
+                                    }
+                                    boolean isChannelNameMatched = false;
+                                    for (int k = 0; k < filterRegexArray.length; k++) {
+                                        isChannelNameMatched = channelName.matches(filterRegexArray[k]);
+                                        if (isChannelNameMatched) {
+                                            break;
+                                        }
+                                    }
+                                    if (!isChannelNameMatched) {
                                         continue;
                                     }
                                 }
+                                // Channel
+                                for (int j = 0; j < this.columnName.length; j++) {
 
-                                if (!getHostCounter && (j == (this.columnName.length - 1))) {
-                                    continue;
-                                }
+                                    if (selectColumnStringArray != null) {
 
-                                prtgOutput.append("<result>");
-                                prtgOutput.append("<channel>");
+                                        String decimeter = "-";
+                                        String[] extractColumnNameArray = this.columnName[j].split(decimeter);
+                                        String extractColumnName = extractColumnNameArray[extractColumnNameArray.length - 1];
 
-                                // System.out.println("ChannelName : "+channelName);
-                                // if ChannelName is null
-                                if (channelName == null || channelName.length() <= 0) {
-                                    prtgOutput = new StringBuilder();
-                                    prtgOutput.append("<prtg>");
-                                    prtgOutput.append("<error>1</error>");
-                                    prtgOutput.append("<text>No Matched Row Found</text>");
-                                    prtgOutput.append("</prtg>");
-                                    return prtgOutput.toString();
-                                }
-                                prtgOutput.append(channelName);
-                                prtgOutput.append("-");
-                                prtgOutput.append(this.columnName[j]);
-                                prtgOutput.append("-MAX");
-                                prtgOutput.append("</channel>");
-                                // Value
-                                if (j == this.columnName.length - 1) {
-                                    logger.info("MaxCounter: " + maxDataSet[i][j]);
-                                }
-
-                                prtgOutput.append("<value>");
-                                int rowMapValue = locationMaxMapper[i];
-                                switch (this.metaData[j]) {
-                                    case StatSummarizationResultSet.TYPE_DATE:
-                                        if (maxDataSet[rowMapValue][j] != null) {
-                                            prtgOutput.append(maxDataSet[rowMapValue][j]);
-                                        } else {
-                                            prtgOutput.append("NoDateStamp");
+                                        boolean foundSelectColumn = (selectColumnList.get(extractColumnName) == null);
+                                        if (foundSelectColumn) {
+                                            continue;
                                         }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_DOUBLE:
-                                        if (maxDataSet[rowMapValue][j] != null && !Double.isNaN((Double) maxDataSet[rowMapValue][j])) {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append(String.format("%.2f", (Double) maxDataSet[rowMapValue][j]));
+                                    }
+
+                                    if (!getHostCounter && (j == (this.columnName.length - 1))) {
+                                        continue;
+                                    }
+
+                                    prtgOutput.append("<result>");
+                                    prtgOutput.append("<channel>");
+
+                                    // System.out.println("ChannelName : "+channelName);
+                                    // if ChannelName is null
+                                    if (channelName == null || channelName.length() <= 0) {
+                                        prtgOutput = new StringBuilder();
+                                        prtgOutput.append("<prtg>");
+                                        prtgOutput.append("<error>1</error>");
+                                        prtgOutput.append("<text>No Matched Row Found</text>");
+                                        prtgOutput.append("</prtg>");
+                                        return prtgOutput.toString();
+                                    }
+                                    prtgOutput.append(channelName);
+                                    prtgOutput.append("-");
+                                    prtgOutput.append(this.columnName[j]);
+                                    prtgOutput.append("-MAX");
+                                    prtgOutput.append("</channel>");
+                                    // Value
+                                    if (j == this.columnName.length - 1) {
+                                        logger.info("MaxCounter: " + maxDataSet[i][j]);
+                                    }
+
+                                    prtgOutput.append("<value>");
+                                    int rowMapValue = locationMaxMapper[i];
+                                    switch (this.metaData[j]) {
+                                        case StatSummarizationResultSet.TYPE_DATE:
+                                            if (maxDataSet[rowMapValue][j] != null) {
+                                                prtgOutput.append(maxDataSet[rowMapValue][j]);
                                             } else {
-                                                prtgOutput.append(String.format("%d", ((Double) maxDataSet[rowMapValue][j]).intValue()));
+                                                prtgOutput.append("NoDateStamp");
                                             }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_DOUBLE:
+                                            if (maxDataSet[rowMapValue][j] != null && !Double.isNaN((Double) maxDataSet[rowMapValue][j])) {
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append(String.format("%.2f", (Double) maxDataSet[rowMapValue][j]));
+                                                } else {
+                                                    prtgOutput.append(String.format("%d", ((Double) maxDataSet[rowMapValue][j]).intValue()));
+                                                }
 //                                            minMaxAverageSumFinder.addMember((Double) maxDataSet[rowMapValue][j]);
-                                        } else {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append("0.0");
                                             } else {
-                                                prtgOutput.append("0");
-                                            }
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append("0.0");
+                                                } else {
+                                                    prtgOutput.append("0");
+                                                }
 
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_FLOAT:
-                                        if (maxDataSet[rowMapValue][j] != null && !Float.isNaN((Float) maxDataSet[rowMapValue][j])) {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append(String.format("%.2f", (Float) maxDataSet[rowMapValue][j]));
-                                            } else {
-                                                prtgOutput.append(String.format("%d", ((Float) maxDataSet[rowMapValue][j]).intValue()));
                                             }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_FLOAT:
+                                            if (maxDataSet[rowMapValue][j] != null && !Float.isNaN((Float) maxDataSet[rowMapValue][j])) {
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append(String.format("%.2f", (Float) maxDataSet[rowMapValue][j]));
+                                                } else {
+                                                    prtgOutput.append(String.format("%d", ((Float) maxDataSet[rowMapValue][j]).intValue()));
+                                                }
 //                                            minMaxAverageSumFinder.addMember((Float) maxDataSet[rowMapValue][j]);
-                                        } else {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append("0.0");
+                                            } else {
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append("0.0");
+                                                } else {
+                                                    prtgOutput.append("0");
+                                                }
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_INT:
+                                            if (maxDataSet[rowMapValue][j] != null) {
+                                                prtgOutput.append(maxDataSet[rowMapValue][j]);
+//                                            minMaxAverageSumFinder.addMember((Integer.parseInt(maxDataSet[rowMapValue][j].toString())));
                                             } else {
                                                 prtgOutput.append("0");
                                             }
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_INT:
-                                        if (maxDataSet[rowMapValue][j] != null) {
-                                            prtgOutput.append(maxDataSet[rowMapValue][j]);
-//                                            minMaxAverageSumFinder.addMember((Integer.parseInt(maxDataSet[rowMapValue][j].toString())));
-                                        } else {
-                                            prtgOutput.append("0");
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_LONG:
-                                        if (maxDataSet[rowMapValue][j] != null) {
-                                            prtgOutput.append(maxDataSet[rowMapValue][j]);
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_LONG:
+                                            if (maxDataSet[rowMapValue][j] != null) {
+                                                prtgOutput.append(maxDataSet[rowMapValue][j]);
 //                                            minMaxAverageSumFinder.addMember((Long.parseLong(maxDataSet[rowMapValue][j].toString())));
-                                        } else {
-                                            prtgOutput.append("0");
+                                            } else {
+                                                prtgOutput.append("0");
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_STRING:
+                                            prtgOutput.append((String) maxDataSet[rowMapValue][j]);
+                                            break;
+                                        default:
+                                            logger.error("Unknown Type");
+                                    }
+                                    prtgOutput.append("</value>");
+                                    if (!hideFloatTag != true) {
+                                        if (this.metaData[j] == StatSummarizationResultSet.TYPE_FLOAT || this.metaData[j] == StatSummarizationResultSet.TYPE_DOUBLE) {
+                                            prtgOutput.append("<float>1</float>");
                                         }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_STRING:
-                                        prtgOutput.append((String) maxDataSet[rowMapValue][j]);
-                                        break;
-                                    default:
-                                        logger.error("Unknown Type");
-                                }
-                                prtgOutput.append("</value>");
-                                if (!hideFloatTag != true) {
-                                    if (this.metaData[j] == StatSummarizationResultSet.TYPE_FLOAT || this.metaData[j] == StatSummarizationResultSet.TYPE_DOUBLE) {
-                                        prtgOutput.append("<float>1</float>");
                                     }
-                                }
 
-                                if (hideUnit == false) {
-                                    prtgOutput.append("<CustomUnit>");
-                                    prtgOutput.append(this.unitType[j]);
-                                    prtgOutput.append("</CustomUnit>");
-                                }
-                                prtgOutput.append("</result>");
-                            } // eng for i
+                                    if (hideUnit == false) {
+                                        prtgOutput.append("<CustomUnit>");
+                                        prtgOutput.append(this.unitType[j]);
+                                        prtgOutput.append("</CustomUnit>");
+                                    }
+                                    prtgOutput.append("</result>");
+                                } // eng for i
+                            }
                         }
-                    if (this.getSiteBlockSubBlockMappingFromMinRowNumber(0) != null) {
-                        for (int i = 0; i < resultSetMin.length; i++) {
+                        if (this.getSiteBlockSubBlockMappingFromMinRowNumber(0) != null) {
+                            for (int i = 0; i < resultSetMin.length; i++) {
 
-                            if (identifierArray != null && i > resultSetCounterMin) {
-                                break;
-                            }
-
-                            if (resultSetMin[i] < 0) {
-                                logger.error("resultSetMin[" + i + "] : " + resultSetMin[i] + ", Less Than Zero");
-                                continue;
-                            }
-
-                            Integer[] siteBlockSubBlockArray = null;
-                            String channelName = null;
-                            siteBlockSubBlockArray = getSiteBlockSubBlockMappingFromMinRowNumber(resultSetMin[i]);
-
-                            boolean printSitePrefix = false;
-                            boolean printBlockPrefix = false;
-                            boolean printSubBlockPrefix = false;
-
-                            if (mapLevel == StatSummarizationSmartResultSet.MAP_SITE || showSitePrefix) {
-                                printSitePrefix = true;
-                            }
-                            if (mapLevel == StatSummarizationSmartResultSet.MAP_BLOCK || showBlockPrefix) {
-                                printBlockPrefix = true;
-                            }
-                            if (mapLevel == StatSummarizationSmartResultSet.MAP_SUBBLOCK) {
-                                printSubBlockPrefix = true;
-                            }
-                            channelName = this.getIdentifier(siteBlockSubBlockArray);
-                            try {
-
-                                int nameCounter = 0;
-                                StringBuilder channelNameBuilder = new StringBuilder();
-                                String[] siteBlockSubBlockName = channelName.split(StatGathererParser.FIELD_SEPARATOR_REPLACE_REGEX);
-                                if (printSitePrefix) {
-                                    channelNameBuilder.append(siteBlockSubBlockName[0]);
-                                    nameCounter++;
+                                if (identifierArray != null && i > resultSetCounterMin) {
+                                    break;
                                 }
-                                if (printBlockPrefix) {
-                                    if (nameCounter > 0) {
-                                        channelNameBuilder.append("-");
-                                    }
-                                    channelNameBuilder.append(siteBlockSubBlockName[1]);
-                                    nameCounter++;
-                                }
-                                if (printSubBlockPrefix) {
-                                    if (nameCounter > 0) {
-                                        channelNameBuilder.append("-");
-                                    }
-                                    channelNameBuilder.append(siteBlockSubBlockName[2]);
-                                    nameCounter++;
-                                }
-                                channelName = channelNameBuilder.toString();
-                            } catch (Exception e) {
-                                channelName = "";
-                                logger.error(e);
-                            }
-                            logger.debug(channelName);
 
-                            if (filterRegex != null && filterRegex.length() > 0 && channelName != null && channelName.length() > 0) {
-                                String[] filterRegexArray = filterRegex.split("%7C");
-                                if (filterRegexArray == null || filterRegexArray.length <= 1) {
-                                    filterRegexArray = filterRegex.split("\\|");
-                                }
-                                boolean isChannelNameMatched = false;
-                                for (int k = 0; k < filterRegexArray.length; k++) {
-                                    isChannelNameMatched = channelName.matches(filterRegexArray[k]);
-                                    if (isChannelNameMatched) {
-                                        break;
-                                    }
-                                }
-                                if (!isChannelNameMatched) {
+                                if (resultSetMin[i] < 0) {
+                                    logger.error("resultSetMin[" + i + "] : " + resultSetMin[i] + ", Less Than Zero");
                                     continue;
                                 }
-                            }
-                            // Channel
-                            for (int j = 0; j < this.columnName.length; j++) {
 
-                                if (selectColumnStringArray != null) {
+                                Integer[] siteBlockSubBlockArray = null;
+                                String channelName = null;
+                                siteBlockSubBlockArray = getSiteBlockSubBlockMappingFromMinRowNumber(resultSetMin[i]);
 
-                                    String decimeter = "-";
-                                    String[] extractColumnNameArray = this.columnName[j].split(decimeter);
-                                    String extractColumnName = extractColumnNameArray[extractColumnNameArray.length - 1];
+                                boolean printSitePrefix = false;
+                                boolean printBlockPrefix = false;
+                                boolean printSubBlockPrefix = false;
 
-                                    boolean foundSelectColumn = (selectColumnList.get(extractColumnName) == null);
-                                    if (foundSelectColumn) {
+                                if (mapLevel == StatSummarizationSmartResultSet.MAP_SITE || showSitePrefix) {
+                                    printSitePrefix = true;
+                                }
+                                if (mapLevel == StatSummarizationSmartResultSet.MAP_BLOCK || showBlockPrefix) {
+                                    printBlockPrefix = true;
+                                }
+                                if (mapLevel == StatSummarizationSmartResultSet.MAP_SUBBLOCK) {
+                                    printSubBlockPrefix = true;
+                                }
+                                channelName = this.getIdentifier(siteBlockSubBlockArray);
+                                try {
+
+                                    int nameCounter = 0;
+                                    StringBuilder channelNameBuilder = new StringBuilder();
+                                    String[] siteBlockSubBlockName = channelName.split(StatGathererParser.FIELD_SEPARATOR_REPLACE_REGEX);
+                                    if (printSitePrefix) {
+                                        channelNameBuilder.append(siteBlockSubBlockName[0]);
+                                        nameCounter++;
+                                    }
+                                    if (printBlockPrefix) {
+                                        if (nameCounter > 0) {
+                                            channelNameBuilder.append("-");
+                                        }
+                                        channelNameBuilder.append(siteBlockSubBlockName[1]);
+                                        nameCounter++;
+                                    }
+                                    if (printSubBlockPrefix) {
+                                        if (nameCounter > 0) {
+                                            channelNameBuilder.append("-");
+                                        }
+                                        channelNameBuilder.append(siteBlockSubBlockName[2]);
+                                        nameCounter++;
+                                    }
+                                    channelName = channelNameBuilder.toString();
+                                } catch (Exception e) {
+                                    channelName = "";
+                                    logger.error(e);
+                                }
+                                logger.debug(channelName);
+
+                                if (filterRegex != null && filterRegex.length() > 0 && channelName != null && channelName.length() > 0) {
+                                    String[] filterRegexArray = filterRegex.split("%7C");
+                                    if (filterRegexArray == null || filterRegexArray.length <= 1) {
+                                        filterRegexArray = filterRegex.split("\\|");
+                                    }
+                                    boolean isChannelNameMatched = false;
+                                    for (int k = 0; k < filterRegexArray.length; k++) {
+                                        isChannelNameMatched = channelName.matches(filterRegexArray[k]);
+                                        if (isChannelNameMatched) {
+                                            break;
+                                        }
+                                    }
+                                    if (!isChannelNameMatched) {
                                         continue;
                                     }
                                 }
+                                // Channel
+                                for (int j = 0; j < this.columnName.length; j++) {
 
-                                if (!getHostCounter && (j == (this.columnName.length - 1))) {
-                                    continue;
-                                }
+                                    if (selectColumnStringArray != null) {
 
-                                prtgOutput.append("<result>");
-                                prtgOutput.append("<channel>");
+                                        String decimeter = "-";
+                                        String[] extractColumnNameArray = this.columnName[j].split(decimeter);
+                                        String extractColumnName = extractColumnNameArray[extractColumnNameArray.length - 1];
 
-                                // System.out.println("ChannelName : "+channelName);
-                                // if ChannelName is null
-                                if (channelName == null || channelName.length() <= 0) {
-                                    prtgOutput = new StringBuilder();
-                                    prtgOutput.append("<prtg>");
-                                    prtgOutput.append("<error>1</error>");
-                                    prtgOutput.append("<text>No Matched Row Found</text>");
-                                    prtgOutput.append("</prtg>");
-                                    return prtgOutput.toString();
-                                }
-                                prtgOutput.append(channelName);
-                                prtgOutput.append("-");
-                                prtgOutput.append(this.columnName[j]);
-                                prtgOutput.append("-MIN");
-                                prtgOutput.append("</channel>");
-                                // Value
-                                if (j == this.columnName.length - 1) {
-                                    logger.info("MinCounter: " + minDataSet[i][j]);
-                                }
-
-                                prtgOutput.append("<value>");
-                                int rowMapValue = locationMinMapper[i];
-                                switch (this.metaData[j]) {
-                                    case StatSummarizationResultSet.TYPE_DATE:
-                                        if (minDataSet[rowMapValue][j] != null) {
-                                            prtgOutput.append(minDataSet[rowMapValue][j]);
-                                        } else {
-                                            prtgOutput.append("NoDateStamp");
+                                        boolean foundSelectColumn = (selectColumnList.get(extractColumnName) == null);
+                                        if (foundSelectColumn) {
+                                            continue;
                                         }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_DOUBLE:
-                                        if (minDataSet[rowMapValue][j] != null && !Double.isNaN((Double) minDataSet[rowMapValue][j])) {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append(String.format("%.2f", (Double) minDataSet[rowMapValue][j]));
-                                            } else {
-                                                prtgOutput.append(String.format("%d", ((Double) minDataSet[rowMapValue][j]).intValue()));
-                                            }
-//                                            minMaxAverageSumFinder.addMember((Double) minDataSet[rowMapValue][j]);
-                                        } else {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append("0.0");
-                                            } else {
-                                                prtgOutput.append("0");
-                                            }
-
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_FLOAT:
-                                        if (minDataSet[rowMapValue][j] != null && !Float.isNaN((Float) minDataSet[rowMapValue][j])) {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append(String.format("%.2f", (Float) minDataSet[rowMapValue][j]));
-                                            } else {
-                                                prtgOutput.append(String.format("%d", ((Float) minDataSet[rowMapValue][j]).intValue()));
-                                            }
-//                                            minMaxAverageSumFinder.addMember((Float) minDataSet[rowMapValue][j]);
-                                        } else {
-                                            if (!hideFloatTag) {
-                                                prtgOutput.append("0.0");
-                                            } else {
-                                                prtgOutput.append("0");
-                                            }
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_INT:
-                                        if (minDataSet[rowMapValue][j] != null) {
-                                            prtgOutput.append(minDataSet[rowMapValue][j]);
-//                                            minMaxAverageSumFinder.addMember(Integer.parseInt(minDataSet[rowMapValue][j].toString()));
-                                        } else {
-                                            prtgOutput.append("0");
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_LONG:
-                                        if (minDataSet[rowMapValue][j] != null) {
-                                            prtgOutput.append(minDataSet[rowMapValue][j]);
-//                                            minMaxAverageSumFinder.addMember(Long.parseLong(minDataSet[rowMapValue][j].toString()));
-                                        } else {
-                                            prtgOutput.append("0");
-                                        }
-                                        break;
-                                    case StatSummarizationResultSet.TYPE_STRING:
-                                        prtgOutput.append((String) minDataSet[rowMapValue][j]);
-                                        break;
-                                    default:
-                                        logger.error("Unknown Type");
-                                }
-                                prtgOutput.append("</value>");
-                                if (!hideFloatTag != true) {
-                                    if (this.metaData[j] == StatSummarizationResultSet.TYPE_FLOAT || this.metaData[j] == StatSummarizationResultSet.TYPE_DOUBLE) {
-                                        prtgOutput.append("<float>1</float>");
                                     }
-                                }
 
-                                if (hideUnit == false) {
-                                    prtgOutput.append("<CustomUnit>");
-                                    prtgOutput.append(this.unitType[j]);
-                                    prtgOutput.append("</CustomUnit>");
+                                    if (!getHostCounter && (j == (this.columnName.length - 1))) {
+                                        continue;
+                                    }
+
+                                    prtgOutput.append("<result>");
+                                    prtgOutput.append("<channel>");
+
+                                    // System.out.println("ChannelName : "+channelName);
+                                    // if ChannelName is null
+                                    if (channelName == null || channelName.length() <= 0) {
+                                        prtgOutput = new StringBuilder();
+                                        prtgOutput.append("<prtg>");
+                                        prtgOutput.append("<error>1</error>");
+                                        prtgOutput.append("<text>No Matched Row Found</text>");
+                                        prtgOutput.append("</prtg>");
+                                        return prtgOutput.toString();
+                                    }
+                                    prtgOutput.append(channelName);
+                                    prtgOutput.append("-");
+                                    prtgOutput.append(this.columnName[j]);
+                                    prtgOutput.append("-MIN");
+                                    prtgOutput.append("</channel>");
+                                    // Value
+                                    if (j == this.columnName.length - 1) {
+                                        logger.info("MinCounter: " + minDataSet[i][j]);
+                                    }
+
+                                    prtgOutput.append("<value>");
+                                    int rowMapValue = locationMinMapper[i];
+                                    switch (this.metaData[j]) {
+                                        case StatSummarizationResultSet.TYPE_DATE:
+                                            if (minDataSet[rowMapValue][j] != null) {
+                                                prtgOutput.append(minDataSet[rowMapValue][j]);
+                                            } else {
+                                                prtgOutput.append("NoDateStamp");
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_DOUBLE:
+                                            if (minDataSet[rowMapValue][j] != null && !Double.isNaN((Double) minDataSet[rowMapValue][j])) {
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append(String.format("%.2f", (Double) minDataSet[rowMapValue][j]));
+                                                } else {
+                                                    prtgOutput.append(String.format("%d", ((Double) minDataSet[rowMapValue][j]).intValue()));
+                                                }
+//                                            minMaxAverageSumFinder.addMember((Double) minDataSet[rowMapValue][j]);
+                                            } else {
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append("0.0");
+                                                } else {
+                                                    prtgOutput.append("0");
+                                                }
+
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_FLOAT:
+                                            if (minDataSet[rowMapValue][j] != null && !Float.isNaN((Float) minDataSet[rowMapValue][j])) {
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append(String.format("%.2f", (Float) minDataSet[rowMapValue][j]));
+                                                } else {
+                                                    prtgOutput.append(String.format("%d", ((Float) minDataSet[rowMapValue][j]).intValue()));
+                                                }
+//                                            minMaxAverageSumFinder.addMember((Float) minDataSet[rowMapValue][j]);
+                                            } else {
+                                                if (!hideFloatTag) {
+                                                    prtgOutput.append("0.0");
+                                                } else {
+                                                    prtgOutput.append("0");
+                                                }
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_INT:
+                                            if (minDataSet[rowMapValue][j] != null) {
+                                                prtgOutput.append(minDataSet[rowMapValue][j]);
+//                                            minMaxAverageSumFinder.addMember(Integer.parseInt(minDataSet[rowMapValue][j].toString()));
+                                            } else {
+                                                prtgOutput.append("0");
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_LONG:
+                                            if (minDataSet[rowMapValue][j] != null) {
+                                                prtgOutput.append(minDataSet[rowMapValue][j]);
+//                                            minMaxAverageSumFinder.addMember(Long.parseLong(minDataSet[rowMapValue][j].toString()));
+                                            } else {
+                                                prtgOutput.append("0");
+                                            }
+                                            break;
+                                        case StatSummarizationResultSet.TYPE_STRING:
+                                            prtgOutput.append((String) minDataSet[rowMapValue][j]);
+                                            break;
+                                        default:
+                                            logger.error("Unknown Type");
+                                    }
+                                    prtgOutput.append("</value>");
+                                    if (!hideFloatTag != true) {
+                                        if (this.metaData[j] == StatSummarizationResultSet.TYPE_FLOAT || this.metaData[j] == StatSummarizationResultSet.TYPE_DOUBLE) {
+                                            prtgOutput.append("<float>1</float>");
+                                        }
+                                    }
+
+                                    if (hideUnit == false) {
+                                        prtgOutput.append("<CustomUnit>");
+                                        prtgOutput.append(this.unitType[j]);
+                                        prtgOutput.append("</CustomUnit>");
+                                    }
+                                    prtgOutput.append("</result>");
                                 }
-                                prtgOutput.append("</result>");
                             }
                         }
                     }
@@ -1713,5 +1707,3 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         return prtgOutput.toString();
     }
 }
-
-
