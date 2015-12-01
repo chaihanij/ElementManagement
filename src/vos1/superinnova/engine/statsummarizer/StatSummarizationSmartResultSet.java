@@ -892,7 +892,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             String evaluateAsIntegerText = prop.getProperty("evaluateAsInteger");
 
             String showMaxMinTPSString = prop.getProperty("showMaxMinTPS");
-
+            String limitChannelString = prop.getProperty("limitChannel");
             MinMaxAverageSumFinder minMaxAverageSumFinder = new MinMaxAverageSumFinder();
 
             boolean showEvaluateOnly = false;
@@ -908,6 +908,11 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             boolean showBlockPrefix = false;
 
             boolean showMaxMinTPS = false;
+            int limitChannel = 0;
+
+            if (limitChannelString != null && !limitChannelString.isEmpty()) {
+                if (limitChannelString.matches("(\\d+|\\D+)")) limitChannel = Integer.parseInt(limitChannelString);
+            }
 
             if (hideUnitString != null && hideUnitString.compareToIgnoreCase("true") == 0) {
                 hideUnit = true;
@@ -1072,16 +1077,12 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                     }
 
                     channelName = this.getIdentifier(siteBlockSubBlockArray);
-                    logger.debug(channelName);
+                    logger.debug("Channel" + channelName);
                     try {
                         int nameCounter = 0;
                         StringBuilder channelNameBuilder = new StringBuilder();
                         String[] siteBlockSubBlockName = channelName.split(StatGathererParser.FIELD_SEPARATOR_REPLACE_REGEX);
-                        //System.out.println("channelName : "+channelName);
-                        //System.out.println("fieldSeparator : "+StatGathererParser.FIELD_SEPARATOR);
-                        //System.out.println("siteBLockSubBLock Lengh : "+siteBlockSubBlockName.length);
 
-                        //System.out.println("CHANNEL [ "+siteBlockSubBlockName[0]+","+siteBlockSubBlockName[1]+", "+siteBlockSubBlockName[0]+" ]");
                         if (printSitePrefix == true) {
                             channelNameBuilder.append(siteBlockSubBlockName[0]);
                             nameCounter++;
@@ -1166,9 +1167,18 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                             prtgOutput.append("</prtg>");
                             return prtgOutput.toString();
                         }
+
                         prtgOutput.append(channelName);
                         prtgOutput.append("-");
-                        prtgOutput.append(this.columnName[j]);
+                        if (limitChannel > 0 ){
+                            if (this.columnName[j].length() >= limitChannel) {
+                                prtgOutput.append(this.columnName[j].substring(0, limitChannel));
+                            } else {
+                                prtgOutput.append(this.columnName[j]);
+                            }
+                        } else {
+                            prtgOutput.append(this.columnName[j]);
+                        }
                         prtgOutput.append("</channel>");
                         // Value
                         if (j == this.columnName.length - 1) {
@@ -1372,7 +1382,15 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                                     }
                                     prtgOutput.append(channelName);
                                     prtgOutput.append("-");
-                                    prtgOutput.append(this.columnName[j]);
+                                    if (limitChannel > 0 ){
+                                        if (this.columnName[j].length() >= limitChannel) {
+                                            prtgOutput.append(this.columnName[j].substring(0, limitChannel));
+                                        } else {
+                                            prtgOutput.append(this.columnName[j]);
+                                        }
+                                    } else {
+                                        prtgOutput.append(this.columnName[j]);
+                                    }
                                     prtgOutput.append("-MAX");
                                     prtgOutput.append("</channel>");
                                     // Value
@@ -1571,7 +1589,15 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                                     }
                                     prtgOutput.append(channelName);
                                     prtgOutput.append("-");
-                                    prtgOutput.append(this.columnName[j]);
+                                    if (limitChannel > 0 ){
+                                        if (this.columnName[j].length() >= limitChannel) {
+                                            prtgOutput.append(this.columnName[j].substring(0, limitChannel));
+                                        } else {
+                                            prtgOutput.append(this.columnName[j]);
+                                        }
+                                    } else {
+                                        prtgOutput.append(this.columnName[j]);
+                                    }
                                     prtgOutput.append("-MIN");
                                     prtgOutput.append("</channel>");
                                     // Value
