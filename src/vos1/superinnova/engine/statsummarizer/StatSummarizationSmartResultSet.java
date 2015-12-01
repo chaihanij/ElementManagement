@@ -892,7 +892,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             String evaluateAsIntegerText = prop.getProperty("evaluateAsInteger");
 
             String showMaxMinTPSString = prop.getProperty("showMaxMinTPS");
-            String limitChannelString = prop.getProperty("limitChannel");
+            String limitChannelString = prop.getProperty("limitChannelName");
             MinMaxAverageSumFinder minMaxAverageSumFinder = new MinMaxAverageSumFinder();
 
             boolean showEvaluateOnly = false;
