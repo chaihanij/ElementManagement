@@ -1738,8 +1738,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             }
 
             if (prtgOutput.toString().compareTo("<PRTG></PRTG>") == 0) {
-                String tmpString = "<PRTG><error>1</error><text>No Raw Data Received</text></PRTG>";
-
+                String tmpString = "<PRTG><text>No Raw Data Received for EM Tools</text></PRTG>";
                 return tmpString;
             }
         }

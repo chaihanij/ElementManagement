@@ -9,6 +9,7 @@ import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEngine;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationModule;
 import vos1.superinnova.engine.statsummarizer.StatSummarizationSmartResultSet;
+import vos1.superinnova.engine.statsummarizer.validate.CheckIfXMLIsWellFormed;
 import vos1.superinnova.util.QueryStringUtil;
 
 import javax.servlet.ServletException;
@@ -16,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -33,10 +35,12 @@ public class SuperInnovaStatInquiryHttpServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Date date = new Date();
         if (this.superInnovaStatCore != null) {
             //response.getWriter().println("SuperInnovaStat, It's work");
             Properties queryString = QueryStringUtil.convertQueryStringToProperties(request.getQueryString());
             logger.debug("Interface : " + request.getQueryString());
+//            response.getWriter().println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             if (queryString != null) {
                 String engineName = queryString.getProperty("Engine");
 //                //response.getWriter().println(QueryStringUtil.convertQueryStringToString(request.getQueryString(), "\n"));
@@ -54,25 +58,40 @@ public class SuperInnovaStatInquiryHttpServlet extends HttpServlet {
                             StatSummarizationSmartResultSet statSummarizationSmartResultSet = statSummarizationModule.getStatSummarizationSmartResultSet();
 
                             if (statSummarizationSmartResultSet != null) {
-                                response.getWriter().println(statSummarizationSmartResultSet.getPRTGOutput(queryString));
-                            } else {
-                                response.getWriter().println("Error : statSummarizationSmartResultSet is null");
-                            }
+                                StringBuilder xmlOutPut = new StringBuilder();
+                                xmlOutPut.append("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+                                xmlOutPut.append(statSummarizationSmartResultSet.getPRTGOutput(queryString));
+                                CheckIfXMLIsWellFormed checkIfXMLIsWellFormed = new CheckIfXMLIsWellFormed(xmlOutPut.toString());
 
+                                if (checkIfXMLIsWellFormed.isXML()) {
+                                    response.getWriter().println(xmlOutPut.toString());
+                                } else {
+                                    response.getWriter().println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+                                    response.getWriter().println("<PRTG><text>EM Tools builder data error</text></PRTG>");
+                                }
+                            } else {
+                                String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>No Raw Data Received for EM Tools ["+ date.toString() + "]</text></PRTG>";
+                                response.getWriter().println(tmpString);
+                            }
                         } else {
-                            response.getWriter().println("Not Found, StatName : " + statName);
+                            String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools not found, StatName : " + statName + "["+ date.toString() + "]</text></PRTG>";
+                            response.getWriter().println(tmpString);
                         }
                     } else {
-                        response.getWriter().println("StatEngine not found.");
+                        String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools stat engine not found ["+ date.toString() + "]</text></PRTG>";
+                        response.getWriter().println(tmpString);
                     }
                 } else {
-                    response.getWriter().println("Error : Input Param is not Found.");
+                    String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>Input Param is not Found ["+ date.toString() + "]</text></PRTG>";
+                    response.getWriter().println(tmpString);
                 }
             } else {
-                response.getWriter().println("Error : This Servlet need queryString as Input.");
+                String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools need queryString as Input ["+ date.toString() + "]</text></PRTG>";
+                response.getWriter().println(tmpString);
             }
         } else {
-            response.getWriter().println("Error : SuperInnovaStatCore is null");
+            String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools SuperInnovaStatCore is null ["+ date.toString() + "]</text></PRTG>";
+            response.getWriter().println(tmpString);
         }
     }
 }
