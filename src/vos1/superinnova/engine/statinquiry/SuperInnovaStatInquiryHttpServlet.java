@@ -35,6 +35,7 @@ public class SuperInnovaStatInquiryHttpServlet extends HttpServlet {
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/xml");
         Date date = new Date();
         if (this.superInnovaStatCore != null) {
             //response.getWriter().println("SuperInnovaStat, It's work");
@@ -67,30 +68,30 @@ public class SuperInnovaStatInquiryHttpServlet extends HttpServlet {
                                     response.getWriter().println(xmlOutPut.toString());
                                 } else {
                                     response.getWriter().println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-                                    response.getWriter().println("<PRTG><text>EM Tools builder data error</text></PRTG>");
+                                    response.getWriter().println("<PRTG><text>[" + date.toString() + "] EM Tools builder data error</text></PRTG>");
                                 }
                             } else {
-                                String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>No Raw Data Received for EM Tools ["+ date.toString() + "]</text></PRTG>";
+                                String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>[" + date.toString() + "]No Raw Data Received for EM Tools and Please check configurations</text></PRTG>";
                                 response.getWriter().println(tmpString);
                             }
                         } else {
-                            String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools not found, StatName : " + statName + "["+ date.toString() + "]</text></PRTG>";
+                            String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>[" + date.toString() + "] EM tools parameter StatName : " + statName + " not found</text></PRTG>";
                             response.getWriter().println(tmpString);
                         }
                     } else {
-                        String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools stat engine not found ["+ date.toString() + "]</text></PRTG>";
+                        String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>["+ date.toString() + "] EM tools parameter engine not found</text></PRTG>";
                         response.getWriter().println(tmpString);
                     }
                 } else {
-                    String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>Input Param is not Found ["+ date.toString() + "]</text></PRTG>";
+                    String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>[" + date.toString() + "] EM tools parameter is not found</text></PRTG>";
                     response.getWriter().println(tmpString);
                 }
             } else {
-                String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools need queryString as Input ["+ date.toString() + "]</text></PRTG>";
+                String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>[" + date.toString() + "] EM tools need to parameter in interface?</text></PRTG>";
                 response.getWriter().println(tmpString);
             }
         } else {
-            String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>EM tools SuperInnovaStatCore is null ["+ date.toString() + "]</text></PRTG>";
+            String tmpString = "<?xml version=\"1.0\" encoding=\"utf-8\"?><PRTG><text>[" + date.toString() + "] EM tools process is null</text></PRTG>";
             response.getWriter().println(tmpString);
         }
     }

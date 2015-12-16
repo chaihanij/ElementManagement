@@ -12,6 +12,7 @@ import vos1.superinnova.util.PRTGUtil;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Objects;
 import java.util.Properties;
 
@@ -1738,7 +1739,8 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             }
 
             if (prtgOutput.toString().compareTo("<PRTG></PRTG>") == 0) {
-                String tmpString = "<PRTG><text>No Raw Data Received for EM Tools</text></PRTG>";
+                Date date =  new Date();
+                String tmpString = "<PRTG><text>["+ date.toString() + "] No Raw Data Received for EM Tools.</text></PRTG>";
                 return tmpString;
             }
         }
