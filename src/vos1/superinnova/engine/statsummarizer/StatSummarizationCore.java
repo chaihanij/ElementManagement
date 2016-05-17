@@ -72,6 +72,7 @@ public class StatSummarizationCore {
             statSummarizationModule = new SupernovaStatAddSubtractModule(this, statSummarizerConfiguration);
         } else {
             Exception e = new Exception("Error : cannot create StatSummarizationModule From Configuration " + statSummarizerConfiguration.statName + ", " + statSummarizerConfiguration.summarizationModule);
+            logger.error(e);
             e.fillInStackTrace();
             throw e;
         }

@@ -82,8 +82,9 @@ public final class SuperInnovaStatCore extends Thread {
     }
 
     public SuperInnovaStatCore(String rootConfigurationPath) {
+        
         logger.info("Element Management Version " + GlobalVariable.VERSION_ID);
-
+        
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
@@ -111,7 +112,6 @@ public final class SuperInnovaStatCore extends Thread {
         for (int i = 0; i < engineConfigurationCounter; i++) {
             String  engineName =  null;
             engineName = this.superInnovaStatCoreConfigurator.engineNameList[i];
-
             try {
                 logger.debug("Set superInnovaStatEngineArray[" + i + "] name [" + engineName + "]");
                 superInnovaStatEngineArray[i] = makeSuperNovaStatEngineFromConfiguration(
@@ -142,6 +142,11 @@ public final class SuperInnovaStatCore extends Thread {
                     statGatherConfiguartionArray,
                     statSummarizerConfigurationArray);
         else if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("PLAYBOX") == 0)
+            superNovaStatEngine = new GeneralSuperInnovaStatEngine(this,
+                    superInnovaStatEngineConfiguration,
+                    statGatherConfiguartionArray,
+                    statSummarizerConfigurationArray);
+        else if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("DAA") == 0)
             superNovaStatEngine = new GeneralSuperInnovaStatEngine(this,
                     superInnovaStatEngineConfiguration,
                     statGatherConfiguartionArray,
@@ -203,7 +208,8 @@ public final class SuperInnovaStatCore extends Thread {
             if (args.length >= 3) {
                 logLevel = args[2];
             }
-
+            GlobalVariable.setBasePath(rootPath.replace("bin/em.jar", ""));
+            System.out.println(rootPath.replace("bin/em.jar", ""));
             LogConfiguration.initialLogConfiguration(logName, logLevel);
 
             if (rootPath != null && rootPath.length() > 0) {

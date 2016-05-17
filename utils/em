@@ -4,6 +4,7 @@
 # Version Descriptions                                                      #
 # 1.0.0	  Init script for start stop restart and view status appliation.    #
 # 1.0.1	  Edit log path
+# 1.0.2   Set -p
 ###############################################################################
 VERSION="1.0.1"
 func_name="main"
@@ -117,6 +118,9 @@ do
             LOGLEVEL=$2
         fi
         shift 2
+    elif [ "$1" == "-p" ]; then
+        BASE="$2"
+        shift 2    
     else
 		break;
 	fi
