@@ -49,7 +49,7 @@ public class SuperInnovaStatInquiryServer extends Thread {
         context.setContextPath("/");
         handlers.addHandler(context);
 
-        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
+        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + "access_" + GlobalVariable.APPLICATION + "_" + this.portNumber + ".log";
         //        String _accessLogPath = GlobalVariable.BASE_LOG_PATH + "access_" + SuperInnovaStatCore.logName + "_" + this.portNumber + ".log";
 
 //        String pwdDEV = "/Users/Wachirawat/Desktop/PresentationEM/Build/SuperInnovaStatEngine/log/";

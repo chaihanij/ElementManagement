@@ -228,6 +228,7 @@ public class SuperInnovaStatCoreConfigurator {
         }//End Try
         catch (Exception e) {
             logger.fatal("Error Configuration");
+            System.exit(-1);
         }
 
 

@@ -4,15 +4,23 @@
  */
 package vos1.superinnova.engine.statproccessor;
 
+import java.io.File;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.log4j.Logger;
 import vos1.superinnova.engine.statinquiry.SuperInnovaStatInquiryCore;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
 import vos1.superinnova.engine.statsummarizer.StatSummarizerConfiguration;
 
-import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 /**
  * @author HugeScreen
  */
@@ -47,10 +55,10 @@ public final class SuperInnovaStatCore extends Thread {
         Integer engineIndex = (Integer) engineNameMap.get(engineName);
 
         if (engineIndex != null) {
-            logger.debug("Engine "+engineName+" found at " + engineIndex);
+            logger.debug("Engine " + engineName + " found at " + engineIndex);
             return this.superInnovaStatEngineArray[engineIndex];
         } else {
-            logger.error("Engine "+engineName+"not found.");
+            logger.error("Engine " + engineName + "not found.");
             return null;
         }
     }
@@ -82,9 +90,9 @@ public final class SuperInnovaStatCore extends Thread {
     }
 
     public SuperInnovaStatCore(String rootConfigurationPath) {
-        
+
         logger.info("Element Management Version " + GlobalVariable.VERSION_ID);
-        
+
         try {
             Thread.sleep(2000);
         } catch (Exception e) {
@@ -110,7 +118,7 @@ public final class SuperInnovaStatCore extends Thread {
         int engineConfigurationCounter = this.superInnovaStatCoreConfigurator.getEngineConfigurationCounter();
         superInnovaStatEngineArray = new SuperInnovaStatEngine[engineConfigurationCounter];
         for (int i = 0; i < engineConfigurationCounter; i++) {
-            String  engineName =  null;
+            String engineName = null;
             engineName = this.superInnovaStatCoreConfigurator.engineNameList[i];
             try {
                 logger.debug("Set superInnovaStatEngineArray[" + i + "] name [" + engineName + "]");
@@ -119,9 +127,9 @@ public final class SuperInnovaStatCore extends Thread {
                         this.superInnovaStatCoreConfigurator.getStatConfigurationArray(i),
                         this.superInnovaStatCoreConfigurator.getStatSummarizerConfigurationArray(i));
                 engineNameMap.put(engineName, superInnovaStatEngineCounter);
-                logger.info("Properties engineNameMap name["+ engineName+"] value["+ superInnovaStatEngineCounter +"]");
+                logger.info("Properties engineNameMap name[" + engineName + "] value[" + superInnovaStatEngineCounter + "]");
             } catch (Exception e) {
-                logger.error("Error engine[" + i + "]" + engineName );
+                logger.error("Error engine[" + i + "]" + engineName);
             }
             superInnovaStatEngineCounter++;
         }
@@ -136,23 +144,24 @@ public final class SuperInnovaStatCore extends Thread {
         logger.info("makeSuperNovaStatEngineFromConfiguration");
         SuperInnovaStatEngine superNovaStatEngine = null;
 
-        if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("SUPERNOVA") == 0)
+        if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("SUPERNOVA") == 0) {
             superNovaStatEngine = new GeneralSuperInnovaStatEngine(this,
                     superInnovaStatEngineConfiguration,
                     statGatherConfiguartionArray,
                     statSummarizerConfigurationArray);
-        else if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("PLAYBOX") == 0)
+        } else if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("PLAYBOX") == 0) {
             superNovaStatEngine = new GeneralSuperInnovaStatEngine(this,
                     superInnovaStatEngineConfiguration,
                     statGatherConfiguartionArray,
                     statSummarizerConfigurationArray);
-        else if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("DAA") == 0)
+        } else if (superInnovaStatEngineConfiguration.getEngineType().compareToIgnoreCase("DAA") == 0) {
             superNovaStatEngine = new GeneralSuperInnovaStatEngine(this,
                     superInnovaStatEngineConfiguration,
                     statGatherConfiguartionArray,
                     statSummarizerConfigurationArray);
-        else
+        } else {
             logger.error("Unknow EngineType" + "[" + superInnovaStatEngineConfiguration.getEngineType() + "]");
+        }
 
         return superNovaStatEngine;
     }
@@ -192,35 +201,113 @@ public final class SuperInnovaStatCore extends Thread {
         }
     }
 
-    public static String logName = null;
-    public static String logLevel = null;
+    public static void main(String[] args) throws org.apache.commons.cli.ParseException {
+        for (String arg : args) {
+            System.out.println(arg);
+        }
+        if (args.length == 0) {
+            new Args().usageHelp();
+            System.err.println("Please input argument.");
+        }
+        String basePath, app, logLevel;
+        app = null;
+        basePath = null;
+        logLevel = null;
 
-    public static void main(String[] args) {
-        if (args != null && args.length > 0) {
-            String rootPath = args[0];
+        Args arg = new Args(args);
 
-             logName = null;
+        if (!(arg.getLine().hasOption("bash-path") && arg.getLine().hasOption("application-name"))) {
+            System.err.println("Please input parameter basePath and logName. ");
+            System.err.println("Example");
+            System.err.println("java -jav em.jar --bash-path=/opt/elementManagement --application-name=app");
+            System.exit(0);
+        }
 
-             logLevel = null;
+        if (arg.getLine().hasOption("log-level")) {
+            logLevel = arg.getLogLevel();
+        }
+        basePath = arg.getBashPath();
+        app = arg.getName();
 
+        GlobalVariable.setBasePath(basePath);
+        GlobalVariable.setApplicationName(app);
 
-            logName = args[1];
-            if (args.length >= 3) {
-                logLevel = args[2];
-            }
-            GlobalVariable.setBasePath(rootPath.replace("bin/em.jar", ""));
-            System.out.println(rootPath.replace("bin/em.jar", ""));
-            LogConfiguration.initialLogConfiguration(logName, logLevel);
-
-            if (rootPath != null && rootPath.length() > 0) {
-
-                SuperInnovaStatCore superInnovaStatCore = new SuperInnovaStatCore(rootPath);
+        LogConfiguration.initialLogConfiguration(app, logLevel);
+        
+        try {
+            File file = new File(GlobalVariable.BASE_CONF_PATH);
+            if (file.exists() && file.isDirectory()) {
+                SuperInnovaStatCore superInnovaStatCore = new SuperInnovaStatCore(GlobalVariable.BASE_CONF_PATH);
                 superInnovaStatCore.start();
             } else {
-                logger.error("Please check configuration path.");
+                logger.error("Configuration dose not exits.");
             }
-        } else {
-            logger.error("Please input configuration path.");
+        } catch (Exception e) {
+            logger.error(e);
+        }
+
+    }
+
+    public static class Args {
+
+        private String name;
+        private String bashPath;
+        private String logLevel;
+
+        private String[] args = null;
+        private Options options = new Options().addOption(OptionBuilder.withLongOpt("log-level")
+                .hasArg()
+                .create()).addOption(OptionBuilder.withLongOpt("bash-path")
+                        .hasArg()
+                        .create()).addOption(OptionBuilder.withLongOpt("application-name")
+                        .hasArg()
+                        .create());
+        private CommandLineParser parser = new DefaultParser();
+        private CommandLine line;
+
+        public Args() {
+
+        }
+
+        public Args(String[] args) {
+            try {
+                this.args = args;
+                this.line = parser.parse(this.options, this.args);
+                if (this.line.hasOption("log-level")) {
+                    this.logLevel = this.line.getOptionValue("log-level");
+                }
+                if (this.line.hasOption("bash-path")) {
+                    this.bashPath = this.line.getOptionValue("bash-path");
+                }
+                if (this.line.hasOption("application-name")) {
+                    this.name = this.line.getOptionValue("application-name");
+                }
+            } catch (ParseException exp) {
+                System.out.println("Unexpected exception:" + exp.getMessage());
+            }
+        }
+
+        public CommandLine getLine() {
+            return line;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getBashPath() {
+            return bashPath;
+        }
+
+        public String getLogLevel() {
+            return logLevel;
+        }
+
+        public void usageHelp() {
+            // This prints out some help
+            HelpFormatter formater = new HelpFormatter();
+            formater.printHelp("Main", options);
+            System.exit(0);
         }
     }
 }
