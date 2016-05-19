@@ -6,7 +6,7 @@
 # 1.0.1	  Edit log path						              #		
 # 1.1.0   Change for run jar file other user 				      #
 ###############################################################################
-VERSION="1.0.1"
+VERSION="1.1.0"
 func_name="main"
 USER=$(whoami)
 BASE="$HOME/elementManagement"
@@ -128,7 +128,7 @@ function check_process () {
     func_name="check_process"
     em_log "INFO" "CHECK PROCESSS"
     local RESULT=""
-    RESULT=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep "--application-name ${SERVICE}"|grep "--base-path ${BASE}" |grep -v grep|awk '{print $2}'`
+    RESULT=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep "${SERVICE}"|grep "${BASE}" |grep -v grep|awk '{print $2}'`
     em_log "DEBUG" "[Process RESULT] ${RESULT}"
     echo  "${RESULT}"
 }
@@ -148,6 +148,16 @@ function check_servicepath () {
         fi
     fi
 }
+
+function check_port () {
+    func_name="check_port"
+    PORT=`grep PORT ${BASE_CONF}/${SERVICE}/mainConfiguration.conf|cut -f2 -d"="`
+    CHECKPORT=`netstat -lnput 2>/dev/null|grep $PORT`
+    if [ "${CHECKPORT}" != "" ]; then 
+     	 echo -e "Please check port listen."
+        exit -1 
+    fi 
+} 
 
 function stop_process () {
     func_name="stop_process"
@@ -179,6 +189,7 @@ function start_process () {
 
     func_name="start_process"
     check_servicepath
+    check_port
     local CHECK_PROCESS=$( check_process )
     if [ ${CHECK_PROCESS} ] ; then
         echo -e "Element management for ${FBLU}${SERVICE}${CDEF} is still ${FRED}running !!!${CDEF}"
@@ -205,8 +216,8 @@ function restart_process () {
 function status_process () {
     func_name="status_process"    
  
-    local PROCESS_A=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep "--application-name ${SERVICE}"|grep "--base-path ${BASE}" |grep -v grep|awk '{print $2}'`
-    local PROCESS_B=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep "--application-name ${SERVICE}"|grep "--base-path ${BASE}" |grep -v grep|awk '{print $3}'`
+    local PROCESS_A=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep "${SERVICE}"|grep "${BASE}" |grep -v grep|awk '{print $2}'`
+    local PROCESS_B=`ps -ef |grep java |grep ${BASE_BIN_EM} |grep "${SERVICE}"|grep "${BASE}" |grep -v grep|awk '{print $3}'`
 
     em_log "INFO" "[PROCESS_A] ${PROCESS_A}"
     em_log "INFO" "[PROCESS_A] ${PROCESS_B}"
@@ -237,6 +248,8 @@ elif [ "${COMMAND}" == "status" ] ; then
     status_process
 elif [ "${COMMAND}" == "check" ] ; then
     check_process
+#elif [ "${COMMAND}" == "tcommand" ];  then
+#    check_port
 else
     em_log "ECHO" "Unknown command"
 fi
