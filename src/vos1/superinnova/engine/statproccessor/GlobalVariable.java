@@ -12,7 +12,7 @@ public class GlobalVariable {
     public static String BASE_BIN_PATH = BASE_PATH + "/bin/";
     public static String BASE_CONF_PATH = BASE_PATH + "/conf";
     public static String BASE_TMP_PATH = BASE_PATH + "/tmp";
-   
+    public static String BASE_CONF_PATH_APP;
     public static String APPLICATION = "app";
 
     public static void setBasePath(String path) {
@@ -25,5 +25,9 @@ public class GlobalVariable {
 
     public static void setApplicationName(String name) {
         APPLICATION = name;
+    }
+
+    public static void setConfApp(String args) {
+        BASE_CONF_PATH_APP = BASE_CONF_PATH + "/" + args;
     }
 }

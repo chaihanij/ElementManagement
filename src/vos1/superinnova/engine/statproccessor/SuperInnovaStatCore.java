@@ -202,13 +202,12 @@ public final class SuperInnovaStatCore extends Thread {
     }
 
     public static void main(String[] args) throws org.apache.commons.cli.ParseException {
-        for (String arg : args) {
-            System.out.println(arg);
-        }
+
         if (args.length == 0) {
             new Args().usageHelp();
             System.err.println("Please input argument.");
         }
+        
         String basePath, app, logLevel;
         app = null;
         basePath = null;
@@ -216,10 +215,10 @@ public final class SuperInnovaStatCore extends Thread {
 
         Args arg = new Args(args);
 
-        if (!(arg.getLine().hasOption("bash-path") && arg.getLine().hasOption("application-name"))) {
+        if (!(arg.getLine().hasOption("base-path") && arg.getLine().hasOption("application-name"))) {
             System.err.println("Please input parameter basePath and logName. ");
             System.err.println("Example");
-            System.err.println("java -jav em.jar --bash-path=/opt/elementManagement --application-name=app");
+            System.err.println("java -jav em.jar --base-path=/opt/elementManagement --application-name=app");
             System.exit(0);
         }
 
@@ -231,13 +230,13 @@ public final class SuperInnovaStatCore extends Thread {
 
         GlobalVariable.setBasePath(basePath);
         GlobalVariable.setApplicationName(app);
-
+        GlobalVariable.setConfApp(app);
         LogConfiguration.initialLogConfiguration(app, logLevel);
-        
+      
         try {
-            File file = new File(GlobalVariable.BASE_CONF_PATH);
+            File file = new File(GlobalVariable.BASE_CONF_PATH_APP);
             if (file.exists() && file.isDirectory()) {
-                SuperInnovaStatCore superInnovaStatCore = new SuperInnovaStatCore(GlobalVariable.BASE_CONF_PATH);
+                SuperInnovaStatCore superInnovaStatCore = new SuperInnovaStatCore(GlobalVariable.BASE_CONF_PATH_APP);
                 superInnovaStatCore.start();
             } else {
                 logger.error("Configuration dose not exits.");
@@ -257,7 +256,7 @@ public final class SuperInnovaStatCore extends Thread {
         private String[] args = null;
         private Options options = new Options().addOption(OptionBuilder.withLongOpt("log-level")
                 .hasArg()
-                .create()).addOption(OptionBuilder.withLongOpt("bash-path")
+                .create()).addOption(OptionBuilder.withLongOpt("base-path")
                         .hasArg()
                         .create()).addOption(OptionBuilder.withLongOpt("application-name")
                         .hasArg()
@@ -276,8 +275,8 @@ public final class SuperInnovaStatCore extends Thread {
                 if (this.line.hasOption("log-level")) {
                     this.logLevel = this.line.getOptionValue("log-level");
                 }
-                if (this.line.hasOption("bash-path")) {
-                    this.bashPath = this.line.getOptionValue("bash-path");
+                if (this.line.hasOption("base-path")) {
+                    this.bashPath = this.line.getOptionValue("base-path");
                 }
                 if (this.line.hasOption("application-name")) {
                     this.name = this.line.getOptionValue("application-name");
