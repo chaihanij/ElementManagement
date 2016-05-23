@@ -2,11 +2,12 @@
 ###############################################################################
 #-----------------------------------------------------------------------------#
 # Version Descriptions                                                        #
+# 1.1.1   Fiexd check port befor start.                                       #
 # 1.0.0	  Init script for start stop restart and view status appliation.      #
-# 1.0.1	  Edit log path						              #		
-# 1.1.0   Change for run jar file other user 				      #
+# 1.0.1	  Edit log path                                                       #
+# 1.1.0   Change for run jar file other user                                  #
 ###############################################################################
-VERSION="1.1.0"
+VERSION="1.1.1"
 func_name="main"
 USER=$(whoami)
 BASE="$HOME/elementManagement"
@@ -152,7 +153,7 @@ function check_servicepath () {
 function check_port () {
     func_name="check_port"
     PORT=`grep PORT ${BASE_CONF}/${SERVICE}/mainConfiguration.conf|cut -f2 -d"="`
-    CHECKPORT=`netstat -lnput 2>/dev/null|grep $PORT`
+	CHECKPORT=`netstat -lnput 2>/dev/null|awk '{print $4}'|grep -r :80$|grep -r :"${PORT}$"`
     if [ "${CHECKPORT}" != "" ]; then 
      	 echo -e "Please check port listen."
         exit -1 

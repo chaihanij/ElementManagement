@@ -1,0 +1,4 @@
+#!/bin/bash
+EXPORTPATH='export PATH=${PATH}:/opt/elementManagement/utils'
+echo $EXPORTPATH >> $HOME/.bash_profile 
+source $HOME/.bash_profile
