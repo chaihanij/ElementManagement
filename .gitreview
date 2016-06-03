@@ -1,0 +1,6 @@
+[gerrit]
+host=10.239.129.153
+port=29418
+project=Element-management.git
+defaultbranch=develop
+defaultremote=gerrit
