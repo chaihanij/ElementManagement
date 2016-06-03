@@ -36,7 +36,6 @@ public abstract class StatSummarizationModule implements Runnable {
     public abstract Object[] getSummarizationResultSet(String key);
 
     public void startStatSummarizationProcess() {
-//        System.out.println("startStatSummarizationProcess : "+this.statSummarizerConfiguration.toString());
         ResultSet rs = fetchDataFromStorage();
         summarizeData(rs);
     }

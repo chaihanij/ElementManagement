@@ -34,14 +34,13 @@ public class SuperInnovaStatInquiryHttpServlet extends HttpServlet {
         this.superInnovaStatCore = superInnovaStatCore;
     }
 
+    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/xml");
         Date date = new Date();
+        response.setContentType("text/xml");
         if (this.superInnovaStatCore != null) {
-            //response.getWriter().println("SuperInnovaStat, It's work");
             Properties queryString = QueryStringUtil.convertQueryStringToProperties(request.getQueryString());
             logger.debug("Interface : " + request.getQueryString());
-//            response.getWriter().println("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
             if (queryString != null) {
                 String engineName = queryString.getProperty("Engine");
 //                //response.getWriter().println(QueryStringUtil.convertQueryStringToString(request.getQueryString(), "\n"));

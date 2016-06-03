@@ -4,6 +4,7 @@
  */
 package vos1.superinnova.engine.statsummarizer;
 
+import java.util.Arrays;
 import org.apache.log4j.Logger;
 
 /**
@@ -32,9 +33,9 @@ public class StatSummarizationResultSet {
     protected String[] columnName = null;
     protected String[] unitType = null;
 
-
     public StatSummarizationResultSet(int row, int[] metaData, String[] columnName, String[] unitType) {
         try {
+            logger.debug(String.format("StatSummarizationResultSet \nrow[%d]\nmetaData[%s]\n\ncolumnName[%s]\nunitType[%s] ", row, Arrays.toString(metaData), Arrays.toString(columnName), Arrays.toString(unitType)));
             if (metaData.length > 0 && (metaData.length == columnName.length) && (columnName.length == unitType.length)) {
                 this.columnSize = metaData.length;
                 this.metaData = metaData;
@@ -45,14 +46,15 @@ public class StatSummarizationResultSet {
                 this.maxDataSet = new Object[row][this.columnSize];
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(e.getMessage());
         }
 
     }
+
     public String getColumnName(Integer i) {
-//        logger.debug("getColumnName = " + this.columnName[i]);
         return this.columnName[i];
     }
+
     public void putObject(int i, int j, Object rowObj) {
         this.lastestDataSet[i][j] = rowObj;
     }
@@ -165,6 +167,7 @@ public class StatSummarizationResultSet {
         sb.append("\n");
         logger.debug(sb.toString());;
     }
+
     public void dumpMaxDataSet() {
         StringBuffer sb = new StringBuffer();
         String separator = ",";

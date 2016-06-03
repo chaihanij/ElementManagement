@@ -32,12 +32,11 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
 
 
     /*
-    public static final int REGEX_PARAM_ATTEMPT=0;
-    public static final int REGEX_PARAM_SUCCESS=1;
-    public static final int REGEX_PARAM_ERROR=2;
-    public static final String[] REGEX_PARAM_NAME={"Attempt","Success","Error"};
-    */
-
+     public static final int REGEX_PARAM_ATTEMPT=0;
+     public static final int REGEX_PARAM_SUCCESS=1;
+     public static final int REGEX_PARAM_ERROR=2;
+     public static final String[] REGEX_PARAM_NAME={"Attempt","Success","Error"};
+     */
     public static final int COL_SITE = 0;
     public static final int COL_BLOCK = 1;
     public static final int COL_SUBBLOCK = 2;
@@ -49,9 +48,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
     public static final int COL_AVERAGECOUNTER = 8;
     public static final int COL_SUMCOUNTER = 9;
 
-
     int categorySize = 0;
-
 
     public static int MAXIMUM_CATEGORY = 96;
     boolean redundancy = false;
@@ -59,7 +56,6 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
     public SupernovaStatCategorizationModule(StatSummarizationCore statSummarizationCore, StatSummarizerConfiguration statSummarizerConfiguration) {
         this.statSummarizationCore = statSummarizationCore;
         this.statSummarizerConfiguration = statSummarizerConfiguration;
-
 
         Properties siteProp = statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SITE_KEYWORD);
         Properties blockProp = statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.BLOCK_KEYWORD);
@@ -77,9 +73,9 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
         } else {
             this.aggregrateType = StatSummarizationSmartResultSet.OPERATION_ADD;
         }
-
+        
         if (statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy") != null) {
-            this.redundancy = Boolean.valueOf(statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy").toString());
+            this.redundancy = Boolean.valueOf(statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy"));
         }
 
         // Count Category Size
@@ -89,8 +85,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
             if (statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_vartype") != null
                     && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_name") != null
                     && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_unit") != null
-                    && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_detectFrom") != null
-                    ) {
+                    && statSummarizerConfiguration.getAdditionalProperties().getProperty("param_category_" + runningNumber + "_detectFrom") != null) {
                 // If configuration was found, Then make 1 increment to category Size
                 this.categorySize++;
             } else {
@@ -162,26 +157,6 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
         unitType[this.categorySize] = "Server";
         inputSRegexParam[this.categorySize] = null;
         divideBy[this.categorySize] = 1;
-        
-        
-        
-        
-        /*
-        for(int i=0;i<metaData.length;i++){
-            System.out.print(","+metaData[i]);
-        }
-        System.out.println("");
-        
-        for(int i=0;i<columnName.length;i++){
-            System.out.print(","+columnName[i]);
-        }
-        System.out.println("");
-        
-        for(int i=0;i<unitType.length;i++){
-            System.out.print(","+unitType[i]);
-        }
-        System.out.println("");
-        */
 
     }
 
@@ -208,8 +183,8 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
 
     public void summarizeResultSet(ResultSet resultSet) {
 
-
         StatSummarizationSmartResultSet tmpStatSummarizationSmartResultSet = null;
+
         tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,
                 this.row,
                 this.metaData,
@@ -223,7 +198,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                 logger.debug("Column : " + this.columnName[i] + " " + this.inputSRegexParam[i].length + " " + Arrays.toString(this.inputSRegexParam[i]));
             }
 
-            for (; resultSet.next(); ) {
+            for (; resultSet.next();) {
                 // Check Date
                 Timestamp dateTimeStamp = resultSet.getTimestamp(1 + SupernovaSuccessRateSummarizationModule.COL_DATE);
                 if (tmpStatSummarizationSmartResultSet.getMaxDate() == null) {
@@ -245,7 +220,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                     // Loop Detected From StatName
                     for (int j = 0; j < this.inputSRegexParam[i].length; j++) {
 //                        logger.debug("Category["+i +"]  " +  "Detect stat size = " + this.inputSRegexParam[i].length);
-                        if (this.inputSRegexParam[i][j] != null && !this.inputSRegexParam[i][j].isEmpty())
+                        if (this.inputSRegexParam[i][j] != null && !this.inputSRegexParam[i][j].isEmpty()) {
                             if (statName.matches(this.inputSRegexParam[i][j]) == true) {
                                 logger.debug("Column : " + this.columnName[i] + " , [" + this.inputSRegexParam[i][j] + "]" + "is  matched " + " , [" + statName + "]");
                                 //System.out.println("matcher : i:"+i+", j:"+j);
@@ -255,9 +230,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                                 int block = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_BLOCK);
                                 int subBlock = (Integer) resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_SUBBLOCK);
                                 //System.out.println("site,Block,SubBlock "+site+", "+block+", "+subBlock);
-                                // In This Situation columnNumber is I
-
-
+                                // In This Situation columnNumber is i
                                 //int operation=StatSummarizationSmartResultSet.OPERATION_ADD;
                                 int operation = this.aggregrateType;
 
@@ -318,7 +291,6 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                                 Object max = resultSet.getObject(1 + SupernovaSuccessRateSummarizationModule.COL_MAXCOUNTER);
 
 //                               logger.debug("AverageTime[" + i + "]" + AverageTime[i]);
-
                                 try {
                                     if (min != null && max != null) {
                                         if (AverageTime[i] > 1) {
@@ -406,6 +378,7 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                                     break;
                                 }
                             }
+                        }
                         // Check if foundMatchesRegex
                         if (!this.redundancy) {
                             if (foundMatchesRegex == true) {
@@ -421,7 +394,6 @@ public class SupernovaStatCategorizationModule extends StatSummarizationModule {
                     }
                 }
             }
-
 
             for (int i = 0; i < tmpStatSummarizationSmartResultSet.getRowCounter(); i++) {
                 // Determine Host Counter

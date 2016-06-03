@@ -23,7 +23,6 @@ public class StatGathererExecutor extends Thread {
     int completedThreadCounter = -1;
     int maxThreadCounter = -1;
 
-
     public StatGathererExecutor(SuperInnovaStatProcessor superInnovaStatProcessor) {
         this.superInnovaStatProcessor = superInnovaStatProcessor;
     }
@@ -56,44 +55,28 @@ public class StatGathererExecutor extends Thread {
 
     public void run() {
         try {
-
-
-            // Select RawTable Before Truncate
             try {
 
                 StatGathererParser statGathererParser = new SuperInnovaStatParser(this);
-                
-                /* ===== Test Dump Result Set =====
-                String[] selectRawTableSQL = statGathererParser.getSelectRawTableSQL(this.superInnovaStatProcessor.getSuperInnovaStatEnginePropertiesLookup());
-                if(selectRawTableSQL!=null && selectRawTableSQL.length>0){
-                    for(int i=0;i<selectRawTableSQL.length;i++){
-                        System.out.println("BEGINE DUMP RESULTSET");
-                        ResultSet kak =this.superInnovaStatProcessor.queryDatabse(selectRawTableSQL[i]);
-                        if(kak!=null){
-                            HSQLDBManager.dump(kak);
-                        }
-                        System.out.println("DONE DUMP RESULTSET");
-                    }
-                }
-                * ===== Test Dump Result Set =====*/
-                // Truncate RawTable Before New Insert
+
                 String[] truncateDatabaseSQL = statGathererParser.getTruncateRawTableSQL(this.superInnovaStatProcessor.getSuperInnovaStatEnginePropertiesLookup());
 
                 StringBuilder _logDebug = new StringBuilder();
-                for (String _truncateDatabaseSQL : truncateDatabaseSQL)
+                for (String _truncateDatabaseSQL : truncateDatabaseSQL) {
                     _logDebug.append(_truncateDatabaseSQL);
+                }
                 logger.debug(_logDebug);
 
                 if (truncateDatabaseSQL != null) {
-                    for (int i = 0; i < truncateDatabaseSQL.length; i++) {
-                        if (truncateDatabaseSQL[i] != null && truncateDatabaseSQL[i].length() > 0) {
-                            this.superInnovaStatProcessor.updateDatabase(truncateDatabaseSQL[i]);
+                    for (String truncateDatabaseSQL1 : truncateDatabaseSQL) {
+                        if (truncateDatabaseSQL1 != null && truncateDatabaseSQL1.length() > 0) {
+                            this.superInnovaStatProcessor.updateDatabase(truncateDatabaseSQL1);
                         }
                     }
                 }
 
             } catch (Exception e) {
-                logger.error(e);
+                logger.error("Error messages: " + e.getMessage());
             }
 
             // Gather & Insert
@@ -124,38 +107,20 @@ public class StatGathererExecutor extends Thread {
                 while (completeAllThread == false) {
                     if ((this.failedThreadCounter + this.completedThreadCounter) >= maxThreadCounter) {
                         completeAllThread = true;
-//                      System.out.println("==*==*==*== All Thread Complete : "+this.getSuperInnovaStatProcessor().getSuperInnovaStatEngine().getSuperInnovaStatEngineConfiguration().getEngineName()+" ==================== ( "+this.completedThreadCounter+" / "+maxThreadCounter+" )");
                         logger.info("Start gather statistics engine  : " + this.getSuperInnovaStatProcessor().getSuperInnovaStatEngine().getSuperInnovaStatEngineConfiguration().getEngineName() + "complete [" + this.completedThreadCounter + "/" + maxThreadCounter + "]");
                         this.superInnovaStatProcessor.beginStatSummarizationProcess();
                     } else {
                         try {
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            logger.error(e);
-//                            e.printStackTrace();
+                            logger.error("Error messages: " + e.getMessage());
                         }
                     }
                 }
-
             }
         } catch (Exception e) {
-            logger.error(e);
-//            e.printStackTrace();
+            logger.error("Error messages: " + e.getMessage());
         }
-
-    }
-
-    public static void main(String[] args) {
-        /*
-        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-        
-        StatGathererExecutor sge = new StatGathererExecutor();
-        
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd HH:mm:ss");
-        String tmp = sdf.format(new java.util.Date());
-        System.out.println("Start : "+tmp);          
-        ScheduledFuture<?> schHandler = scheduler.scheduleAtFixedRate(sge, TimeUtil.calculateDelayInMillisecToNextLaunch(5), 5000, TimeUnit.MILLISECONDS);
-        * */
     }
 }
 
@@ -173,32 +138,27 @@ class StatGathererExecutorChild implements Runnable {
 
     public void run() {
         try {
-
             if (this.statGatherConfiguartion != null) {
                 logger.debug("Gather statistics : " + statGatherConfiguartion.toString());
-
                 StatGatherer statGatherer = null;
                 String output = null;
                 if (this.statGatherConfiguartion.getFetchType() == StatGatherConfiguration.FETCHTYPE_HTTP) {
-
-                    // Gather
-                    statGatherer = new HTTPStatGatherer(statGatherConfiguartion.getUrl());
+                    statGatherer = new HTTPStatGatherer(statGatherConfiguartion.getUrl(), this.statGatherConfiguartion.fetchTimeOut);
                     output = statGatherer.gather();
-                    // Prepare Parser Output
                 } else {
                     logger.error("ERROR : UNKNOWN FETCH TYPE");
-//                    System.out.println("ERROR : UNKNOWN FETCH TYPE");
                     return;
                 }
 
-                // Prepare Parser Output
                 StatGathererParser statGathererParser = new SuperInnovaStatParser(this.statGathererExecutor);
                 String[] insertIntoRawTableSQL = null;
-                if (statGathererParser != null && output != null) {
 
+                logger.debug("Insert data to memory");
+                if (statGathererParser != null && output != null) {
                     insertIntoRawTableSQL = statGathererParser.getInsertRawTableSQL(output, statGatherConfiguartion, this.statGathererExecutor.superInnovaStatProcessor.getSuperInnovaStatEnginePropertiesLookup());
 
                 }
+
                 if (insertIntoRawTableSQL != null && insertIntoRawTableSQL.length > 0) {
                     int insetIntoRawTableSQLSuccess = 0;
                     for (int i = 0; i < insertIntoRawTableSQL.length; i++) {
@@ -210,9 +170,7 @@ class StatGathererExecutorChild implements Runnable {
                                 }
                             } catch (Exception e) {
                                 logger.error("Error SQL updateDatabase: " + insertIntoRawTableSQL[i]);
-//                                System.out.println("Error SQL : " +
-                                logger.error(e);
-//                                e.printStackTrace();
+                                logger.error("Error messages: " + e.getMessage());
                             }
                         }
                     }
@@ -221,12 +179,11 @@ class StatGathererExecutorChild implements Runnable {
                         this.statGathererExecutor.tickCompletedThreadCounter();
                         return;
                     }
-                }// End If insertIntoRawTableSQL            
+                }
             }
         } catch (Exception e) {
             this.statGathererExecutor.tickFailedThreadCounter();
-            logger.error(e);
-//            e.printStackTrace();
+            logger.error("Error messages: " + e.getMessage());
         }
         this.statGathererExecutor.tickFailedThreadCounter();
     }

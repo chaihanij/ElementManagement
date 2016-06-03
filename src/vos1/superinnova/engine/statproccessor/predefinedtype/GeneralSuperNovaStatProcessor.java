@@ -58,7 +58,7 @@ public class GeneralSuperNovaStatProcessor extends SuperInnovaStatProcessor {
         return this.ocfSuperInnovaStatEngine.getSuperInnovaStatEnginePropertiesLookup().get(category, key);
     }
 
-    public void initSuperInnovaStatDatabase() {
+    private void initSuperInnovaStatDatabase() {
         logger.info("initSuperInnovaStatDatabase");
 
         dbConnection = new HSQLDBManager();
@@ -94,7 +94,7 @@ public class GeneralSuperNovaStatProcessor extends SuperInnovaStatProcessor {
 
         } catch (Exception e) {
             logger.error("create data error");
-            logger.fatal(e);
+            logger.fatal(e.getMessage());
         }
 
 
