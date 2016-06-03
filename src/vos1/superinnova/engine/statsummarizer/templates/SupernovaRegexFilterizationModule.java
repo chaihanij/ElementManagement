@@ -403,7 +403,7 @@ public class SupernovaRegexFilterizationModule extends StatSummarizationModule {
         } catch (Exception e) {
             logger.error("statSummarizationSmartResultSet = null");
             this.statSummarizationSmartResultSet = null;
-            logger.error(e);
+            logger.error(e.getMessage());
         }
 
     }

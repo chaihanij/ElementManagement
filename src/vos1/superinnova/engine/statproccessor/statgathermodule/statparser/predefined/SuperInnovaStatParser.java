@@ -6,9 +6,7 @@ package vos1.superinnova.engine.statproccessor.statgathermodule.statparser.prede
 
 import java.io.BufferedReader;
 import java.io.StringReader;
-
 import org.apache.log4j.Logger;
-import vos1.superinnova.engine.statproccessor.SuperInnovaStatCore;
 import vos1.superinnova.engine.statproccessor.SuperInnovaStatEnginePropertiesLookup;
 import vos1.superinnova.engine.statproccessor.predefinedengine.GeneralSuperInnovaStatEngine;
 import vos1.superinnova.engine.statproccessor.statgathermodule.StatGatherConfiguration;
@@ -30,21 +28,21 @@ public class SuperInnovaStatParser extends StatGathererParser {
 
     @Override
     public String[] getCreateRawTableSQL(SuperInnovaStatEnginePropertiesLookup superInnovaStatEnginePropertiesLookup) {
-        String createRawSuperInnovaTable = "create table raw_" + superInnovaStatEnginePropertiesLookup.get("ENGINE", "StorageName") + "\n" +
-                "(\n" +
-                "site int,\n" +
-                "block int,\n" +
-                "subBlock int,\n" +
-                "date DATETIME,\n" +
-                "hostname VARCHAR(32),\n" +
-                "statName VARCHAR(256),\n" +
-                "minCounter int,\n" +
-                "maxCounter int,\n" +
-                "averageCounter float,\n" +
-                "sumCounter BIGINT,\n" +
-                "primary key (site,block,subBlock,date,hostname,statname),\n" +
-                "unique (date,hostname,statname)\n" +
-                ")";
+        String createRawSuperInnovaTable = "create table raw_" + superInnovaStatEnginePropertiesLookup.get("ENGINE", "StorageName") + "\n"
+                + "(\n"
+                + "site int,\n"
+                + "block int,\n"
+                + "subBlock int,\n"
+                + "date DATETIME,\n"
+                + "hostname VARCHAR(32),\n"
+                + "statName VARCHAR(256),\n"
+                + "minCounter int,\n"
+                + "maxCounter int,\n"
+                + "averageCounter float,\n"
+                + "sumCounter BIGINT,\n"
+                + "primary key (site,block,subBlock,date,hostname,statname),\n"
+                + "unique (date,hostname,statname)\n"
+                + ")";
         return new String[]{createRawSuperInnovaTable};
     }
 
@@ -149,7 +147,7 @@ public class SuperInnovaStatParser extends StatGathererParser {
 
         } catch (Exception e) {
             logger.error("Parser data error [" + sqlStringBuffer.toString() + "]");
-            logger.error(e);
+            logger.error("Error messages: " + e.getMessage());
             return null;
         }
 

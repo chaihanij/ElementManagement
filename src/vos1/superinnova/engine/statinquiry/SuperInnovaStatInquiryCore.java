@@ -21,7 +21,7 @@ public class SuperInnovaStatInquiryCore {
         this.superInnovaStatCore=superInnovaStatCore;
         initInquiryCore();
     }
-    public void initInquiryCore(){
+    private void initInquiryCore(){
         if(this.superInnovaStatCore!=null){
             Properties superInnovaStatInquiryCoreConfiguration = this.superInnovaStatCore.getEngineCoreConfiguration();
             String inquiryPortString=superInnovaStatInquiryCoreConfiguration.getProperty("STAT_INQUIRY_PORT");

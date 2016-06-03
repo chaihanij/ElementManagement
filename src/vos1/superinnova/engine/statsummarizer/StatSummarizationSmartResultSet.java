@@ -12,6 +12,7 @@ import vos1.superinnova.util.PRTGUtil;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Properties;
@@ -138,7 +139,7 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
 
     public StatSummarizationSmartResultSet(StatSummarizationCore statSummarizationCore, int row, int[] metaData, String[] columnName, String[] unitType) {
         super(row, metaData, columnName, unitType);
-
+        
         this.statSummarizationCore = statSummarizationCore;
 
         Properties siteProp = statSummarizationCore.getSuperInnovaStatProcessor().getSuperInnovaStatEnginePropertiesLookup().getCategory(GeneralSuperInnovaStatEngine.SITE_KEYWORD);
@@ -178,10 +179,10 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
         reverseMaxRowMapping = new Properties();
 
         clearCounter();
-        //this.row=siteProp.stringPropertyNames().size()+blockProp.stringPropertyNames().size()+subBlockProp.stringPropertyNames().size()+1;
+        
     }
 
-    public void clearCounter() {
+    private void clearCounter() {
         minDate = null;
         maxDate = null;
 
@@ -309,21 +310,21 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
     public void putObject(int site, int block, int subBlock, int columnNumber, int operation, Object obj) {
         if (this.siteLevelLocationArray[site] == -1) {
             this.siteLevelLocationArray[site] = rowCounter;
-            Integer[] indexArray = new Integer[]{new Integer(site), null, null};
+            Integer[] indexArray = new Integer[]{site, null, null};
             this.reverseRowMapping.put(rowCounter, indexArray);
 //            logger.debug("***PUT SITE " + site + ", rowCounter : " + rowCounter);
             this.rowCounter++;
         }
         if (this.blockLevelLocationArray[block] == -1) {
             this.blockLevelLocationArray[block] = rowCounter;
-            Integer[] indexArray = new Integer[]{null, new Integer(block), null};
+            Integer[] indexArray = new Integer[]{null, block, null};
             this.reverseRowMapping.put(rowCounter, indexArray);
 //            logger.debug("***PUT Block "+block+", rowCounter : "+rowCounter);
             this.rowCounter++;
         }
         if (this.subBlockLevelLocationArray[subBlock] == -1) {
             this.subBlockLevelLocationArray[subBlock] = rowCounter;
-            Integer[] indexArray = new Integer[]{null, null, new Integer(subBlock)};
+            Integer[] indexArray = new Integer[]{null, null, subBlock};
             this.reverseRowMapping.put(rowCounter, indexArray);
 //            logger.debug("***PUT SUBBLOCK "+subBlock+", rowCounter : "+rowCounter);
             this.rowCounter++;
@@ -331,13 +332,13 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
 
         // Check if there is sub block inside site
         if (siteLevelHostListArray[site].get(subBlock) == null) {
-            siteLevelHostListArray[site].put(new Integer(subBlock), true);
+            siteLevelHostListArray[site].put(subBlock, true);
         }
         if (blockLevelHostListArray[block].get(subBlock) == null) {
-            blockLevelHostListArray[block].put(new Integer(subBlock), true);
+            blockLevelHostListArray[block].put(subBlock, true);
         }
         if (subBlockLevelHostListArray[subBlock].get(subBlock) == null) {
-            subBlockLevelHostListArray[subBlock].put(new Integer(subBlock), true);
+            subBlockLevelHostListArray[subBlock].put(subBlock, true);
         }
 
         // Put Object // Site Put
@@ -352,21 +353,21 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
     public void putObject(int site, int block, int subBlock, int columnNumber, int operation, Object obj, Objects min, Object max) {
         if (this.siteLevelLocationArray[site] == -1) {
             this.siteLevelLocationArray[site] = rowCounter;
-            Integer[] indexArray = new Integer[]{new Integer(site), null, null};
+            Integer[] indexArray = new Integer[]{site, null, null};
             this.reverseRowMapping.put(rowCounter, indexArray);
 //            logger.debug("***PUT SITE " + site + ", rowCounter : " + rowCounter);
             this.rowCounter++;
         }
         if (this.blockLevelLocationArray[block] == -1) {
             this.blockLevelLocationArray[block] = rowCounter;
-            Integer[] indexArray = new Integer[]{null, new Integer(block), null};
+            Integer[] indexArray = new Integer[]{null, block, null};
             this.reverseRowMapping.put(rowCounter, indexArray);
 //            logger.debug("***PUT Block "+block+", rowCounter : "+rowCounter);
             this.rowCounter++;
         }
         if (this.subBlockLevelLocationArray[subBlock] == -1) {
             this.subBlockLevelLocationArray[subBlock] = rowCounter;
-            Integer[] indexArray = new Integer[]{null, null, new Integer(subBlock)};
+            Integer[] indexArray = new Integer[]{null, null, subBlock};
             this.reverseRowMapping.put(rowCounter, indexArray);
 //            logger.debug("***PUT SUBBLOCK "+subBlock+", rowCounter : "+rowCounter);
             this.rowCounter++;
@@ -374,13 +375,13 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
 
         // Check if there is sub block inside site
         if (siteLevelHostListArray[site].get(subBlock) == null) {
-            siteLevelHostListArray[site].put(new Integer(subBlock), true);
+            siteLevelHostListArray[site].put(subBlock, true);
         }
         if (blockLevelHostListArray[block].get(subBlock) == null) {
-            blockLevelHostListArray[block].put(new Integer(subBlock), true);
+            blockLevelHostListArray[block].put(subBlock, true);
         }
         if (subBlockLevelHostListArray[subBlock].get(subBlock) == null) {
-            subBlockLevelHostListArray[subBlock].put(new Integer(subBlock), true);
+            subBlockLevelHostListArray[subBlock].put(subBlock, true);
         }
 
         // Put Object // Site Put
@@ -916,7 +917,9 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             int limitChannel = 0;
 
             if (limitChannelString != null && !limitChannelString.isEmpty()) {
-                if (limitChannelString.matches("(\\d+|\\D+)")) limitChannel = Integer.parseInt(limitChannelString);
+                if (limitChannelString.matches("(\\d+|\\D+)")) {
+                    limitChannel = Integer.parseInt(limitChannelString);
+                }
             }
 
             if (hideUnitString != null && hideUnitString.compareToIgnoreCase("true") == 0) {
@@ -967,7 +970,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             if (showMinTPSString != null && showMinTPSString.compareToIgnoreCase("true") == 0) {
                 showMinTPS = true;
             }
-
 
             // Init Select Column Process
             String selectColumnString = prop.getProperty("selectColumn");
@@ -1055,26 +1057,13 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                         logger.error("resultSet[" + i + "] : " + resultSet[i] + ", Less Than Zero");
                         continue;
                     }
-
+                    
                     // Identify SiteBlockSubblock & Channel Name
                     Integer[] siteBlockSubBlockArray = null;
                     String channelName = null;
-                    //System.out.println("resultSet[i] : "+resultSet[i]);
+              
                     siteBlockSubBlockArray = getSiteBlockSubBlockMappingFromRowNumber(resultSet[i]);
-                    /*
-                     for(int xz=0;xz<siteBlockSubBlockArray.length;xz++){
-                     if(siteBlockSubBlockArray[xz]!=null){
-                     System.out.println("xz : "+xz+", data : "+siteBlockSubBlockArray[xz]);
-                     }
-                     }
-                     */
 
-                    /*WRONG
-                     String siteName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_SITE);
-                     String blockName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_BLOCK);
-                     String subBlockName=this.getStringPrefixIdentifier(siteBlockSubBlockArray, StatSummarizationSmartResultSet.MAP_SUBBLOCK);
-                     System.out.println("SBS , "+siteName+", "+blockName+", "+subBlockName);
-                     */
                     boolean printSitePrefix = false;
                     boolean printBlockPrefix = false;
                     boolean printSubBlockPrefix = false;
@@ -1131,9 +1120,9 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                          }
                          */
                         boolean isChannelNameMatched = false;
-                        for (int k = 0; k < filterRegexArray.length; k++) {
+                        for (String filterRegexArray1 : filterRegexArray) {
                             //System.out.println("checkMatched-channelName : "+channelName+", regex : "+filterRegexArray[k]+", status : "+channelName.matches(filterRegexArray[k]));
-                            isChannelNameMatched = channelName.matches(filterRegexArray[k]);
+                            isChannelNameMatched = channelName.matches(filterRegexArray1);
                             if (isChannelNameMatched == true) {
                                 //System.out.println("channelName : "+channelName+", regex : "+filterRegexArray[k]);
                                 break;
@@ -1702,7 +1691,6 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
                     }
                 }
 
-
                 // Evaluate Result ????
                 if (showEvaluateOnly == true) {
                     double min = minMaxAverageSumFinder.getMin();
@@ -1739,8 +1727,8 @@ public class StatSummarizationSmartResultSet extends StatSummarizationResultSet 
             }
 
             if (prtgOutput.toString().compareTo("<PRTG></PRTG>") == 0) {
-                Date date =  new Date();
-                String tmpString = "<PRTG><text>["+ date.toString() + "] No Raw Data Received for EM Tools.</text></PRTG>";
+                Date date = new Date();
+                String tmpString = "<PRTG><text>[" + date.toString() + "] No Raw Data Received for EM Tools.</text></PRTG>";
                 return tmpString;
             }
         }

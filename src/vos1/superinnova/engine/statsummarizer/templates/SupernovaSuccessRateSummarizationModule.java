@@ -82,7 +82,7 @@ public class SupernovaSuccessRateSummarizationModule extends StatSummarizationMo
         }
 
         if (statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy") != null) {
-            redundancy = Boolean.valueOf(statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy").toString());
+            redundancy = Boolean.valueOf(statSummarizerConfiguration.getAdditionalProperties().getProperty("enable_redundancy"));
         }
     }
 

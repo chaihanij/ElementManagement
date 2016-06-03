@@ -12,34 +12,33 @@ import vos1.superinnova.engine.statproccessor.statgathermodule.util.http.HTTPRea
  *
  * @author HugeScreen
  */
-public class HTTPStatGatherer extends StatGatherer{
+public class HTTPStatGatherer extends StatGatherer {
+
     final static Logger logger = Logger.getLogger(HTTPStatGatherer.class);
 
-    String url=null;
-    public HTTPStatGatherer(String url){
-        this.url=url;
+    private String url = null;
+    private int fetchTimeOut;
+
+    public HTTPStatGatherer(String url, int fetchTimeOut) {
+        this.url = url;
+        this.fetchTimeOut = fetchTimeOut;
     }
-    public String gather(){
-        //System.out.println("GATHER Call");
-        this.gathererStatus=StatGatherer.STATUS_STARTED;
-        try{
-            this.gatherOutput=HTTPReader.openConnection(this.url);
-//            logger.debug("Output [" + this.gatherOutput + "]");
-            //System.out.println(this.gatherOutput);
+
+    @Override
+    public String gather() {
+
+        this.gathererStatus = StatGatherer.STATUS_STARTED;
+        try {
+            logger.debug("Gatherer statistics for: " + this.url);
+            this.gatherOutput = new HTTPReader().openConnection(this.url, this.fetchTimeOut);
+            logger.debug("Output statistics  [" + this.gatherOutput + "]");
+
+        } catch (Exception e) {
+            logger.error("Gatherer statistics error :" + this.url);
+            logger.error("Message error:" + e.getMessage());
+            this.gathererStatus = StatGatherer.STATUS_ERROR;
         }
-        catch(Exception e){
-            logger.error("Get statistic error :" + this.url);
-            this.gathererStatus=StatGatherer.STATUS_ERROR;
-        }
-        this.gathererStatus=StatGatherer.STATUS_FINISHED;
-        //System.out.println("GATHER OUTPUT :"+this.gatherOutput);
+        this.gathererStatus = StatGatherer.STATUS_FINISHED;
         return this.gatherOutput;
-        
-    }
-    public static void main(String[] args){
-        StatGatherer sg = new HTTPStatGatherer("http://localhost:9016/equinoxStat?nodeType=OCF&hostname=OCF201");
-        sg.gather();
-        System.out.println(sg.getGatherOutput());
-        
     }
 }

@@ -199,26 +199,6 @@ public class SupernovaStatAddSubtractModule extends StatSummarizationModule{
     }
 
     public void summarizeResultSet(ResultSet resultSet){
-            /*
-    try{
-         ResultSetMetaData rsmd = resultSet.getMetaData();
-    System.out.println("querying SELECT * FROM XXX");
-    int columnsNumber = rsmd.getColumnCount();
-    while (resultSet.next()) {
-        for (int i = 1; i <= columnsNumber; i++) {
-            if (i > 1) System.out.print(",  ");
-            String columnValue = resultSet.getString(i);
-            System.out.print(columnValue + " " + rsmd.getColumnName(i));
-        }
-        System.out.println("");
-    }
-    }
-    catch(Exception e){
-        e.printStackTrace();
-    }
-            
-            */
-
             
             StatSummarizationSmartResultSet tmpStatSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);
             //this.statSummarizationSmartResultSet = new StatSummarizationSmartResultSet(this.statSummarizationCore,this.row,this.metaData,this.columnName,this.unitType);
